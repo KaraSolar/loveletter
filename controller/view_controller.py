@@ -1,10 +1,10 @@
 class ViewController():
-    def __init__(self, view, data_base_queue, registers_lock, data_bus, modbus_loop_break):
+    def __init__(self, view, data_base_queue, registers_lock, data_bus, trip_start_signal_event):
         self.view = view
         self.data_base_queue = data_base_queue
         self.registers_lock = registers_lock
         self.data_bus = data_bus
-        self.modbus_loop_break = modbus_loop_break
+        self.trip_start_signal_event = trip_start_signal_event
         self.configure_data_display_buttons()
         self.configure_passenger_input_buttons()
         self.configure_initiate_trip_frame_buttons()
@@ -33,7 +33,7 @@ class ViewController():
         self.data_base_queue.put(passenger_number)
         with self.registers_lock:
             self.data_bus["sampling_rate"] = 1
-            self.modbus_loop_break.set()
+            self.trip_start_signal_event.set()
 
     def configure_finish_trip_frame_buttons(self):
         self.view.finish_trip_frame.no_button.config(command=lambda: self.view.raise_frame("data_display_frame"))
@@ -45,7 +45,6 @@ class ViewController():
         with self.registers_lock:
             self.data_bus["sampling_rate"] = 15
         self.view.raise_frame("data_display_frame")
-        self.modbus_loop_break.clear()
 
     def update_view(self) -> None:
         with self.registers_lock:

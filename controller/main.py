@@ -14,7 +14,6 @@ Note Daemon threads are abruptly stopped at shutdown. Their resources (such as o
 
 import threading
 import queue
-import time
 from model.modbus_query import ModbusQuery
 from pymodbus.exceptions import ModbusException, ModbusIOException
 from model.telemetry_database import TelemetryDatabase
@@ -24,7 +23,8 @@ class Controller:
     def __init__(self, view):
         self.view = view
         self.registers_lock = threading.Lock()
-        self.modbus_loop_break = threading.Event()
+        self.modbus_query_worker_destroy_event = threading.Event()
+        self.trip_start_signal_event = threading.Event()
         self.data_base_queue = queue.Queue(maxsize=0)
         self.data_bus = {"telemetry": {"battery_voltage": None, "battery_current": None,
                                        "battery_power": None, "battery_state_of_charge": None,
@@ -33,11 +33,10 @@ class Controller:
                                        "longitude2": None, "course": None, "speed": None,
                                        "gps_fix": None, "gps_number_of_satellites": None,
                                        "altitude1": None, "altitude2": None},
-                         "sampling_rate": 15,
-                         "destroy": False}
+                         "sampling_rate": 15}
 
-        self.view_controller = ViewController(self.view,self.data_base_queue, self.registers_lock,
-                                              self.data_bus, self.modbus_loop_break)
+        self.view_controller = ViewController(self.view, self.data_base_queue, self.registers_lock,
+                                              self.data_bus, self.trip_start_signal_event)
         self.closing_keys()
         self.first_worker = threading.Thread(target=self.modbus_query_worker)
         self.first_worker.start()
@@ -52,12 +51,12 @@ class Controller:
 
     def close_on_escape(self,event=None):
         print("cerrando el programa...")
+        self.trip_start_signal_event.set()  # break wait time for next query
+        self.modbus_query_worker_destroy_event.set() # destroy modbus
         with self.registers_lock:
-            self.modbus_loop_break.set()
-            self.data_bus["destroy"] = True
             self.data_base_queue.put("destroy")
-        self.first_worker.join(timeout=5)  # tops 5 seconds to terminate the program
-        self.second_worker.join(timeout=5)  # tops 5 seconds to terminate the program
+        self.first_worker.join()
+        self.second_worker.join()
         self.closing()
         self.view.root.destroy()
 
@@ -85,7 +84,6 @@ class Controller:
             # to the db instead of closing the program when queue is not empty
             message = self.data_base_queue.get()
             if message == "destroy":
-                telemetry_database.close_connection()
                 break
             elif message == "telemetry":
                 with self.registers_lock:
@@ -94,15 +92,12 @@ class Controller:
                 telemetry_database.end_of_trip()
             else:
                 telemetry_database.insert_trip(message)
-        return 0
+        telemetry_database.close_connection()
 
     def modbus_query_worker(self):
         modbus_query = ModbusQuery()
-        while True:  # replace with close event
+        while self.modbus_query_worker_destroy_event.is_set() is False:  # replace with close event
             with self.registers_lock: # could be eliminated
-                if self.data_bus["destroy"]:
-                    modbus_query.disconnect()
-                    break
                 rate = self.data_bus["sampling_rate"] # stays
             try:
                 modbus_query.read_telemetry_registers()
@@ -117,7 +112,7 @@ class Controller:
                     for index, key in enumerate(self.data_bus["telemetry"]):
                         self.data_bus["telemetry"][key] = modbus_query.register_values[index]
                 self.data_base_queue.put("telemetry")
-            for _ in range(rate):
-                if self.modbus_loop_break.wait(timeout=1):
-                    break
-        return 0
+            if self.trip_start_signal_event.wait(timeout=rate): # wait rate unless trip_start_signal received
+                self.trip_start_signal_event.clear()
+                continue
+        modbus_query.disconnect()
