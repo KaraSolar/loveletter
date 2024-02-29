@@ -9,6 +9,7 @@ more the software will little to no gain. This also applies for modbus tcp conne
 it will remain open in first worker and not be passed anywhere else (this module pymodbus is not
 thread safe).
 
+Note Daemon threads are abruptly stopped at shutdown. Their resources (such as open files, database transactions, etc.) may not be released properly. If you want your threads to stop gracefully, make them non-daemonic and use a suitable signalling mechanism such as an Event.
 '''
 
 import threading
@@ -19,35 +20,28 @@ from pymodbus.exceptions import ModbusException, ModbusIOException
 from model.telemetry_database import TelemetryDatabase
 from .view_controller import ViewController
 
-class Controller():
+class Controller:
     def __init__(self, view):
         self.view = view
         self.registers_lock = threading.Lock()
         self.modbus_loop_break = threading.Event()
         self.data_base_queue = queue.Queue(maxsize=0)
-        self.data_bus = {"telemetry":{"battery_voltage":None, "battery_current":None,
-                                      "battery_power":None, "battery_state_of_charge":None,
-                                      "pv-dc-coupled_power":None, "pv-dc-coupled_current":None,
-                                      "latitude1":None, "latitude2":None, "longitude1":None,
-                                      "longitude2":None, "course":None, "speed":None,
-                                      "gps_fix":None, "gps_number_of_satellites":None,
-                                      "altitude1":None, "altitude2":None},
-                         "sampling_rate":15,
-                         "destroy":False}
+        self.data_bus = {"telemetry": {"battery_voltage": None, "battery_current": None,
+                                       "battery_power": None, "battery_state_of_charge": None,
+                                       "pv-dc-coupled_power": None, "pv-dc-coupled_current": None,
+                                       "latitude1": None, "latitude2": None, "longitude1": None,
+                                       "longitude2": None, "course": None, "speed": None,
+                                       "gps_fix": None, "gps_number_of_satellites": None,
+                                       "altitude1": None, "altitude2": None},
+                         "sampling_rate": 15,
+                         "destroy": False}
 
         self.view_controller = ViewController(self.view,self.data_base_queue, self.registers_lock,
                                               self.data_bus, self.modbus_loop_break)
         self.closing_keys()
-        self.first_worker = threading.Thread(target=self.modbus_query_worker,
-                                             args=(self.registers_lock,
-                                                   self.data_base_queue,
-                                                   self.data_bus,
-                                                   self.modbus_loop_break,))
+        self.first_worker = threading.Thread(target=self.modbus_query_worker)
         self.first_worker.start()
-        self.second_worker = threading.Thread(target=self.telemetry_database_worker,
-                                              args=(self.registers_lock,
-                                                    self.data_base_queue,
-                                                    self.data_bus,))
+        self.second_worker = threading.Thread(target=self.telemetry_database_worker)
         self.second_worker.start()
         self.loop_update_view()
 
@@ -62,8 +56,8 @@ class Controller():
             self.modbus_loop_break.set()
             self.data_bus["destroy"] = True
             self.data_base_queue.put("destroy")
-        self.first_worker.join()
-        self.second_worker.join()
+        self.first_worker.join(timeout=5)  # tops 5 seconds to terminate the program
+        self.second_worker.join(timeout=5)  # tops 5 seconds to terminate the program
         self.closing()
         self.view.root.destroy()
 
@@ -75,7 +69,7 @@ class Controller():
         while True:
             status_first_worker = self.first_worker.is_alive()
             status_second_worker = self.second_worker.is_alive()
-            if status_first_worker == False and status_second_worker == False:
+            if status_first_worker is False and status_second_worker is False:
                 break
         return 0
 
@@ -83,45 +77,47 @@ class Controller():
         self.view_controller.update_view()
         self.view.root.after(1000, self.loop_update_view)
 
-    def telemetry_database_worker(self, registers_lock, data_base_queue, data_bus):
+    def telemetry_database_worker(self):
         telemetry_database = TelemetryDatabase()
-        while True:
-            message = data_base_queue.get()
+        while True:  # if queue is large this will take time to complete
+            # the choice of true and that there is a explicit message in the queue "destroy"
+            # is because if the queue has more elements the objective is to actually write them
+            # to the db instead of closing the program when queue is not empty
+            message = self.data_base_queue.get()
             if message == "destroy":
                 telemetry_database.close_connection()
                 break
             elif message == "telemetry":
-                with registers_lock:
-                    telemetry_database.insert_telemetry(data_bus["telemetry"])
+                with self.registers_lock:
+                    telemetry_database.insert_telemetry(self.data_bus["telemetry"])
             elif message == "end_of_trip":
                 telemetry_database.end_of_trip()
             else:
                 telemetry_database.insert_trip(message)
         return 0
 
-    def modbus_query_worker(self, registers_lock, data_base_queue, data_bus, modbus_loop_break):
+    def modbus_query_worker(self):
         modbus_query = ModbusQuery()
-        while True:
-            with registers_lock:
-                if data_bus["destroy"] == True:
+        while True:  # replace with close event
+            with self.registers_lock: # could be eliminated
+                if self.data_bus["destroy"]:
                     modbus_query.disconnect()
                     break
-                rate = data_bus["sampling_rate"]
+                rate = self.data_bus["sampling_rate"] # stays
             try:
                 modbus_query.read_telemetry_registers()
             except (ModbusIOException, ModbusException, AttributeError) as exe:
                 # add to logs
-                with registers_lock:
-                    for key in data_bus["telemetry"]:
-                        data_bus["telemetry"][key] = None
+                with self.registers_lock:
+                    for key in self.data_bus["telemetry"]:
+                        self.data_bus["telemetry"][key] = None
                 continue
             else:
-                with registers_lock:
-                    for index, key in enumerate(data_bus["telemetry"]):
-                        data_bus["telemetry"][key] = modbus_query.register_values[index]
-                data_base_queue.put("telemetry")
+                with self.registers_lock:
+                    for index, key in enumerate(self.data_bus["telemetry"]):
+                        self.data_bus["telemetry"][key] = modbus_query.register_values[index]
+                self.data_base_queue.put("telemetry")
             for _ in range(rate):
-                if modbus_loop_break.is_set():
+                if self.modbus_loop_break.wait(timeout=1):
                     break
-                time.sleep(1)
         return 0
