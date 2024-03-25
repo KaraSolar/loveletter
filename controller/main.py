@@ -22,18 +22,9 @@ from .view_controller import ViewController
 class Controller:
     def __init__(self, view):
         self.view = view
-        self.registers_lock = threading.Lock()
         self.modbus_query_worker_destroy_event = threading.Event()
         self.trip_start_signal_event = threading.Event()
         self.data_base_queue = queue.Queue(maxsize=0)
-        self.data_bus = {"telemetry": {"battery_voltage": None, "battery_current": None,
-                                       "battery_power": None, "battery_state_of_charge": None,
-                                       "pv-dc-coupled_power": None, "pv-dc-coupled_current": None,
-                                       "latitude1": None, "latitude2": None, "longitude1": None,
-                                       "longitude2": None, "course": None, "speed": None,
-                                       "gps_fix": None, "gps_number_of_satellites": None,
-                                       "altitude1": None, "altitude2": None},
-                         "sampling_rate": 15}
 
         self.view_controller = ViewController(self.view, self.data_base_queue, self.registers_lock,
                                               self.data_bus, self.trip_start_signal_event)
