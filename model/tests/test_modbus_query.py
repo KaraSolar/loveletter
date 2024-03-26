@@ -27,6 +27,7 @@ def start_server() -> multiprocessing.Process:
 def modbus_object(start_server):
     modbus_object = ModbusQuery()
     yield modbus_object
+    modbus_object.disconnect()
 
 
 def test_getters_setters():
@@ -121,6 +122,7 @@ def test_read_telemetry_registers(modbus_object):
 
 
 def test_read_and_format_telemetry_registers(modbus_object):
+    "Integration test."
     modbus_object.read_registers(840, 1)
     modbus_object.read_and_format_telemetry_registers()  # Increase 3 values
     modbus_object.read_and_format_telemetry_registers()  # Increase 3 more values
@@ -140,6 +142,7 @@ def test_read_and_format_telemetry_registers(modbus_object):
 
 def test_read_registers_and_read_telemetry_registers_disconnection(start_server, modbus_object):
     """
+    Integration test.
     testing the sudden termination of the server.
     After the disconnection of the server for hours the client object still maintains the socket
     but then the .registers method will raise an AttributeError, 'ModbusIOException' object

@@ -2,14 +2,16 @@
 TO DOS:
     For the new frames, make them destroy instead of being there.
 
-This software adheres to the recomendation of keeping a database connection in only one thread
+We adhere to the recommendation of keeping a database connection in only one thread
 and not passing it to other threads will remain open in second worker. There is a way to parse a conn
 to another thread by setting the check_same_thread = False in sqlite3, however, that will complicate
 more the software will little to no gain. This also applies for modbus tcp connection,
 it will remain open in first worker and not be passed anywhere else (this module pymodbus is not
 thread safe).
 
-Note Daemon threads are abruptly stopped at shutdown. Their resources (such as open files, database transactions, etc.) may not be released properly. If you want your threads to stop gracefully, make them non-daemonic and use a suitable signalling mechanism such as an Event.
+Note Daemon threads are abruptly stopped at shutdown. Their resources (such as open files,
+database transactions, etc.) may not be released properly. If you want your threads to stop gracefully,
+make them non-daemonic and use a suitable signalling mechanism such as an Event.
 '''
 
 import threading
