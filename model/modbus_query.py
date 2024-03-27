@@ -23,13 +23,6 @@ class ModbusQuery:
         self.client = ModbusTcpClient(self.server_ip, port=self.server_port)
         self.client.connect()  # even if false when querying the registers the socket will be opened.
         self.__register_values = None
-        self.__telemetry = {"battery_voltage": None, "battery_current": None,
-                            "battery_power": None, "battery_state_of_charge": None,
-                            "pv-dc-coupled_power": None, "pv-dc-coupled_current": None,
-                            "latitude1": None, "latitude2": None, "longitude1": None,
-                            "longitude2": None, "course": None, "speed": None,
-                            "gps_fix": None, "gps_number_of_satellites": None,
-                            "altitude1": None, "altitude2": None}
 
     @property  # Getter
     def server_ip(self) -> str:
@@ -86,12 +79,13 @@ class ModbusQuery:
         else:
             self.__register_values = battery_regs + solar_regs + georef_regs
 
-    def set_telemetry_dict_to_none(self) -> None:
+    def set_register_values_to_none(self) -> None:
         """
-        This function encapsulates replacing every value in the telemetry dict to None.
+        This function encapsulates replacing every value in the registers value list to None.
         :return: None
         """
-        self.__telemetry = {key: None for key in self.__telemetry}
+        number_of_registers = 16
+        self.__register_values = [None] * number_of_registers
 
     def set_scaling(self) -> None:
         """
@@ -121,27 +115,22 @@ class ModbusQuery:
             if self.__register_values[index] >= 32768:
                 self.__register_values[index] = self.__register_values[index] - 65536
 
-    def read_and_format_telemetry_registers(self) -> dict:
+    def read_and_format_telemetry_registers(self) -> list:
         """
-        This method uses read_telemetry_registers(), set_scaling() and set_negative_values() methods.
+        This method uses read_telemetry_registers, set_scaling, set_negative_values and
+        set_register_values_to_none.
         Encapsulates every procedure for querying the modbus, set the scaling and set negative values
-        and stores the telemetry values in the telemetry dict and returns a copy of that dict.
-        If high ram is used might be because of this however, the garbage collector should be freeing
-        this no longer referenced objects fast. Each second a new dict will be created, referenced
-        and dereference.
-        The dict itself is private and should not be accessed directly.
-        :return: dict
+        and stores the telemetry values in the telemetry list and returns a copy of that list.
+        :return: list
         """
         try:
             self.read_telemetry_registers()
         except (ModbusIOException, ModbusException, ConnectionException, AttributeError):
-            self.set_telemetry_dict_to_none()
+            self.set_register_values_to_none()
         else:
             self.set_scaling()
             self.set_negative_values()
-            for index, key in enumerate(self.__telemetry):
-                self.__telemetry[key] = self.__register_values[index]
-        return self.__telemetry.copy()  # this is a important part of the function.
+        return self.__register_values.copy()
 
     def disconnect(self) -> int:
         """

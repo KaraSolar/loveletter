@@ -62,22 +62,17 @@ def test_read_registers(modbus_object):
         modbus_query.read_registers(40000, 1)
 
 
-def test_set_telemetry_dict_to_none(modbus_object):
-    """
-    The telemetry object is private, please don't use it outside of testing and the class itself.
-    """
-    obj = getattr(modbus_object, '_ModbusQuery__telemetry')
-    for key in obj:
-        obj[key] = 8
-    modbus_object.set_telemetry_dict_to_none()
-    obj = getattr(modbus_object, '_ModbusQuery__telemetry')
-    assert obj["altitude1"] is None
+def test_set_register_values_to_none(modbus_object):
+    expected_values = [None] * 16
+    modbus_object._ModbusQuery__register_values = [8] * 16
+    modbus_object.set_register_values_to_none()
+    assert modbus_object._ModbusQuery__register_values == expected_values
+    modbus_object._ModbusQuery__register_values = ["cat"] * 16
+    modbus_object.set_register_values_to_none()
+    assert modbus_object._ModbusQuery__register_values == expected_values
 
 
 def test_set_scaling(modbus_object):
-    """
-    The register_values object is  private, please don't use it outside of testing and the class itself.
-    """
     modbus_object._ModbusQuery__register_values = [100, 200, 500, 20, 20, 1000, 0, 0, 0, 0, 0, 10000,
                                                    12, 12, 12, 12]
     modbus_object.set_scaling()
@@ -89,10 +84,7 @@ def test_set_scaling(modbus_object):
 
 
 def test_set_negative_values(modbus_object):
-    """
-    The register_values object is  private, please don't use it outside of testing and the class itself.
-    just use this https://www.simonv.fr/TypesConvert/?integers
-    """
+    # Handy reference for conversion: https://www.simonv.fr/TypesConvert/?integers
     modbus_object._ModbusQuery__register_values = [100, 63000, 32767, 20, 20, 65536, 0, 0, 0, 0, 0, 10000,
                                                    12, 12, 12, 12]
     modbus_object.set_negative_values()
@@ -104,9 +96,6 @@ def test_set_negative_values(modbus_object):
 
 
 def test_read_telemetry_registers(modbus_object):
-    """
-    The register_values object is  private, please don't use it outside of testing and the class itself.
-    """
     try:
         modbus_object.read_registers(40000, 1)  # Loose connection to server
     except ConnectionException:
@@ -122,21 +111,15 @@ def test_read_telemetry_registers(modbus_object):
 
 
 def test_read_and_format_telemetry_registers(modbus_object):
-    "Integration test."
+    # Integration test
     modbus_object.read_registers(840, 1)
     modbus_object.read_and_format_telemetry_registers()  # Increase 3 values
     modbus_object.read_and_format_telemetry_registers()  # Increase 3 more values
 
     telemetry = modbus_object.read_and_format_telemetry_registers()
-    assert type(telemetry) == dict
-    assert id(telemetry) != id(modbus_object._ModbusQuery__telemetry)
-    expected_values = {"battery_voltage": 0.7, "battery_current": 0.7,
-                       "battery_power": 7, "battery_state_of_charge": 7,
-                       "pv-dc-coupled_power": 8, "pv-dc-coupled_current": 0.8,
-                       "latitude1": 9, "latitude2": 9, "longitude1": 9,
-                       "longitude2": 9, "course": 9, "speed": 0.09,
-                       "gps_fix": 9, "gps_number_of_satellites": 9,
-                       "altitude1": 9, "altitude2": 9}
+    assert type(telemetry) == list
+    assert id(telemetry) != id(modbus_object._ModbusQuery__register_values)
+    expected_values = [0.7, 0.7, 7, 7, 8, 0.8, 9, 9, 9, 9, 9, 0.09, 9, 9, 9, 9]
     assert telemetry == expected_values
 
 
@@ -162,7 +145,7 @@ def test_read_registers_and_read_telemetry_registers_disconnection(start_server,
         modbus_query.read_telemetry_registers()
     time.sleep(2)
     telemetry = modbus_query.read_and_format_telemetry_registers()
-    assert all(value is None for value in telemetry.values())
+    assert all(value is None for value in telemetry)
 
 
 def test_disconnect(modbus_object):

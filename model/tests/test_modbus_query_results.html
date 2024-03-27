@@ -253,9 +253,9 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
 }
 </script>
     <h1>test_modbus_query_results.html</h1>
-    <p>Report generated on 25-Mar-2024 at 22:01:26 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
+    <p>Report generated on 27-Mar-2024 at 23:59:11 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
     <h2>Summary</h2>
-    <p>10 tests ran in 35.35 seconds. </p>
+    <p>10 tests ran in 31.89 seconds. </p>
     <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">10 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
     <h2>Results</h2>
     <table id="results-table">
@@ -280,22 +280,22 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">model/tests/test_modbus_query.py::test_init_method</td>
-          <td class="col-duration">5.02</td>
+          <td class="col-duration">2.00</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>ERROR    pymodbus.client.sync:sync.py:219 Connection to (139.112.255.0, 502) failed: timed out<br/></div></td></tr></tbody>
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>ERROR    pymodbus.client.sync:sync.py:219 Connection to (139.112.255.0, 502) failed: [WinError 10065] A socket operation was attempted to an unreachable host<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">model/tests/test_modbus_query.py::test_read_registers</td>
-          <td class="col-duration">2.52</td>
+          <td class="col-duration">2.49</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>ERROR    root:modbus_query.py:65 Server error or disconnected.
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>ERROR    root:modbus_query.py:58 during reading register
 Traceback (most recent call last):
-  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 62, in read_registers
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 55, in read_registers
     response = self.client.read_holding_registers(address=address, count=count, unit=unit)
   File &quot;c:\users\danie\pycharmprojects\loveletter\myenv\lib\site-packages\pymodbus\client\common.py&quot;, line 114, in read_holding_registers
     return self.execute(request)
@@ -315,12 +315,12 @@ Traceback (most recent call last):
     size, data, time.time() - time_)
   File &quot;c:\users\danie\pycharmprojects\loveletter\myenv\lib\site-packages\pymodbus\client\sync.py&quot;, line 342, in _handle_abrupt_socket_close
     raise ConnectionException(msg)
-pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] ModbusTcpClient(127.0.0.1:502): Connection unexpectedly closed 0.411850 seconds into read of 8 bytes without response from unit before it closed connection<br/></div></td></tr></tbody>
+pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] ModbusTcpClient(127.0.0.1:502): Connection unexpectedly closed 0.315320 seconds into read of 8 bytes without response from unit before it closed connection<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">model/tests/test_modbus_query.py::test_set_telemetry_dict_to_none</td>
-          <td class="col-duration">2.02</td>
+          <td class="col-name">model/tests/test_modbus_query.py::test_set_register_values_to_none</td>
+          <td class="col-duration">2.00</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
@@ -329,7 +329,7 @@ pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] ModbusTcpCli
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">model/tests/test_modbus_query.py::test_set_scaling</td>
-          <td class="col-duration">2.03</td>
+          <td class="col-duration">2.01</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
@@ -338,7 +338,7 @@ pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] ModbusTcpCli
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">model/tests/test_modbus_query.py::test_set_negative_values</td>
-          <td class="col-duration">2.02</td>
+          <td class="col-duration">2.00</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
@@ -347,13 +347,13 @@ pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] ModbusTcpCli
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">model/tests/test_modbus_query.py::test_read_telemetry_registers</td>
-          <td class="col-duration">2.71</td>
+          <td class="col-duration">2.55</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>ERROR    root:modbus_query.py:65 Server error or disconnected.
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>ERROR    root:modbus_query.py:58 during reading register
 Traceback (most recent call last):
-  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 62, in read_registers
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 55, in read_registers
     response = self.client.read_holding_registers(address=address, count=count, unit=unit)
   File &quot;c:\users\danie\pycharmprojects\loveletter\myenv\lib\site-packages\pymodbus\client\common.py&quot;, line 114, in read_holding_registers
     return self.execute(request)
@@ -373,12 +373,12 @@ Traceback (most recent call last):
     size, data, time.time() - time_)
   File &quot;c:\users\danie\pycharmprojects\loveletter\myenv\lib\site-packages\pymodbus\client\sync.py&quot;, line 342, in _handle_abrupt_socket_close
     raise ConnectionException(msg)
-pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] ModbusTcpClient(127.0.0.1:502): Connection unexpectedly closed 0.434968 seconds into read of 8 bytes without response from unit before it closed connection<br/></div></td></tr></tbody>
+pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] ModbusTcpClient(127.0.0.1:502): Connection unexpectedly closed 0.325455 seconds into read of 8 bytes without response from unit before it closed connection<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">model/tests/test_modbus_query.py::test_read_and_format_telemetry_registers</td>
-          <td class="col-duration">2.63</td>
+          <td class="col-duration">2.56</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
@@ -387,19 +387,32 @@ pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] ModbusTcpCli
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">model/tests/test_modbus_query.py::test_read_registers_and_read_telemetry_registers_disconnection</td>
-          <td class="col-duration">12.24</td>
+          <td class="col-duration">12.15</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>ERROR    root:modbus_query.py:65 Server error or disconnected.
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>ERROR    root:modbus_query.py:58 during reading register
 Traceback (most recent call last):
-  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 63, in read_registers
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 56, in read_registers
     response = response.registers
 AttributeError: &#x27;ModbusIOException&#x27; object has no attribute &#x27;registers&#x27;
 ERROR    pymodbus.client.sync:sync.py:219 Connection to (127.0.0.1, 502) failed: [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR    root:modbus_query.py:65 Server error or disconnected.
+ERROR    root:modbus_query.py:58 during reading register
 Traceback (most recent call last):
-  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 62, in read_registers
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 55, in read_registers
+    response = self.client.read_holding_registers(address=address, count=count, unit=unit)
+  File &quot;c:\users\danie\pycharmprojects\loveletter\myenv\lib\site-packages\pymodbus\client\common.py&quot;, line 114, in read_holding_registers
+    return self.execute(request)
+  File &quot;c:\users\danie\pycharmprojects\loveletter\myenv\lib\site-packages\pymodbus\client\sync.py&quot;, line 108, in execute
+    raise ConnectionException(&quot;Failed to connect[%s]&quot; % (self.__str__()))
+pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] Failed to connect[ModbusTcpClient(127.0.0.1:502)]
+ERROR    root:modbus_query.py:77 during reading of telemetry
+Traceback (most recent call last):
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 73, in read_telemetry_registers
+    battery_regs = self.read_registers(address=840, count=4)  # 840 to 843
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 59, in read_registers
+    raise exe
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 55, in read_registers
     response = self.client.read_holding_registers(address=address, count=count, unit=unit)
   File &quot;c:\users\danie\pycharmprojects\loveletter\myenv\lib\site-packages\pymodbus\client\common.py&quot;, line 114, in read_holding_registers
     return self.execute(request)
@@ -407,9 +420,22 @@ Traceback (most recent call last):
     raise ConnectionException(&quot;Failed to connect[%s]&quot; % (self.__str__()))
 pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] Failed to connect[ModbusTcpClient(127.0.0.1:502)]
 ERROR    pymodbus.client.sync:sync.py:219 Connection to (127.0.0.1, 502) failed: [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR    root:modbus_query.py:65 Server error or disconnected.
+ERROR    root:modbus_query.py:58 during reading register
 Traceback (most recent call last):
-  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 62, in read_registers
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 55, in read_registers
+    response = self.client.read_holding_registers(address=address, count=count, unit=unit)
+  File &quot;c:\users\danie\pycharmprojects\loveletter\myenv\lib\site-packages\pymodbus\client\common.py&quot;, line 114, in read_holding_registers
+    return self.execute(request)
+  File &quot;c:\users\danie\pycharmprojects\loveletter\myenv\lib\site-packages\pymodbus\client\sync.py&quot;, line 108, in execute
+    raise ConnectionException(&quot;Failed to connect[%s]&quot; % (self.__str__()))
+pymodbus.exceptions.ConnectionException: Modbus Error: [Connection] Failed to connect[ModbusTcpClient(127.0.0.1:502)]
+ERROR    root:modbus_query.py:77 during reading of telemetry
+Traceback (most recent call last):
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 73, in read_telemetry_registers
+    battery_regs = self.read_registers(address=840, count=4)  # 840 to 843
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 59, in read_registers
+    raise exe
+  File &quot;C:\Users\danie\PycharmProjects\loveletter\model\modbus_query.py&quot;, line 55, in read_registers
     response = self.client.read_holding_registers(address=address, count=count, unit=unit)
   File &quot;c:\users\danie\pycharmprojects\loveletter\myenv\lib\site-packages\pymodbus\client\common.py&quot;, line 114, in read_holding_registers
     return self.execute(request)

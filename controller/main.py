@@ -19,8 +19,16 @@ import queue
 from .view_controller import ViewController
 from workers import WorkerDatabase, WorkerModbus
 
+
 class Controller:
     def __init__(self, view):
+        self.telemetry_data_bus = {"battery_voltage": None, "battery_current": None,
+                                   "battery_power": None, "battery_state_of_charge": None,
+                                   "pv-dc-coupled_power": None, "pv-dc-coupled_current": None,
+                                   "latitude1": None, "latitude2": None, "longitude1": None,
+                                   "longitude2": None, "course": None, "speed": None,
+                                   "gps_fix": None, "gps_number_of_satellites": None,
+                                   "altitude1": None, "altitude2": None}
         self.view = view
         self.stop_workers_signal = threading.Event()
         self.trip_mode_flag_signal = threading.Event()
@@ -37,14 +45,13 @@ class Controller:
         self.second_worker.start()
         self.loop_update_view()
 
-
     def closing_keys(self):
         self.view.root.bind('<Escape>', self.close_on_escape)
 
-    def close_on_escape(self,event=None):
+    def close_on_escape(self, event=None):
         print("cerrando el programa...")
         self.trip_start_signal_event.set()  # break wait time for next query
-        self.modbus_query_worker_destroy_event.set() # destroy modbus
+        self.modbus_query_worker_destroy_event.set()  # destroy modbus
         with self.registers_lock:
             self.data_base_queue.put("destroy")
         self.first_worker.join()
@@ -67,4 +74,3 @@ class Controller:
     def loop_update_view(self):
         self.view_controller.update_view()
         self.view.root.after(1000, self.loop_update_view)
-
