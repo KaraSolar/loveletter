@@ -48,7 +48,6 @@ class PassengerInput(ttk.Frame):
         self.label_font_size: tuple = label_font_size
         self.passenger_number_var: ttk.IntVar = ttk.IntVar(value=self.min_passenger)
 
-
         # ____________FrameConfiguration_____________
         self.columnconfigure((0,1,2), weight= 1, uniform="a")
 
