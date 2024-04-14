@@ -72,13 +72,33 @@ def test_set_register_values_to_none(modbus_object):
     assert modbus_object._ModbusQuery__register_values == expected_values
 
 
+def test_set_telemetry_from_register_values(modbus_object):
+    modbus_object._ModbusQuery__register_values = [100, 200, 500, 20, 20, 1000, 0, 0, 0, 0, 0, 10000,
+                                                   12, 12, 12, 12]
+    modbus_object.set_telemetry_from_register_values()
+    expected_values = {"battery_voltage": 100, "battery_current": 200,
+                              "battery_power": 500, "battery_state_of_charge": 20,
+                              "pv-dc-coupled_power": 20, "pv-dc-coupled_current": 1000,
+                              "latitude1": 0, "latitude2": 0, "longitude1": 0,
+                              "longitude2": 0, "course": 0, "speed": 10000,
+                              "gps_fix": 12, "gps_number_of_satellites": 12,
+                              "altitude1": 12, "altitude2": 12}
+    assert modbus_object._ModbusQuery__telemetry == expected_values
+    modbus_object._ModbusQuery__register_values = [None] * 16
+    modbus_object.set_telemetry_from_register_values()
+    assert modbus_object._ModbusQuery__telemetry["battery_voltage"] == None
+
+
 def test_set_scaling(modbus_object):
     modbus_object._ModbusQuery__register_values = [100, 200, 500, 20, 20, 1000, 0, 0, 0, 0, 0, 10000,
                                                    12, 12, 12, 12]
+    modbus_object.set_telemetry_from_register_values()
     modbus_object.set_scaling()
-    expected_values = [10, 20, 500, 20, 20, 100, 0, 0, 0, 0, 0, 100, 12, 12, 12, 12]
-    assert modbus_object._ModbusQuery__register_values == expected_values
-    modbus_object._ModbusQuery__register_values = ["cat"] * 16
+    assert modbus_object._ModbusQuery__telemetry["battery_voltage"] == 10
+    assert modbus_object._ModbusQuery__telemetry["battery_current"] == 20
+    assert modbus_object._ModbusQuery__telemetry["pv-dc-coupled_current"] == 100
+    assert modbus_object._ModbusQuery__telemetry["speed"] == 100
+    modbus_object._ModbusQuery__telemetry = {key: "cat" for key in modbus_object._ModbusQuery__telemetry}
     with pytest.raises(TypeError):
         modbus_object.set_scaling()
 
@@ -87,12 +107,14 @@ def test_set_negative_values(modbus_object):
     # Handy reference for conversion: https://www.simonv.fr/TypesConvert/?integers
     modbus_object._ModbusQuery__register_values = [100, 63000, 32767, 20, 20, 65536, 0, 0, 0, 0, 0, 10000,
                                                    12, 12, 12, 12]
+    modbus_object.set_telemetry_from_register_values()
     modbus_object.set_negative_values()
-    expected_values = [100, -2536, 32767, 20, 20, 0, 0, 0, 0, 0, 0, 10000, 12, 12, 12, 12]
-    assert modbus_object._ModbusQuery__register_values == expected_values
-    modbus_object._ModbusQuery__register_values = ["cat"] * 16
+    assert modbus_object._ModbusQuery__telemetry["battery_current"] == -2536
+    assert modbus_object._ModbusQuery__telemetry["battery_power"] == 32767
+    assert modbus_object._ModbusQuery__telemetry["pv-dc-coupled_current"] == 0
+    modbus_object._ModbusQuery__telemetry = {key: "cat" for key in modbus_object._ModbusQuery__telemetry}
     with pytest.raises(TypeError):
-        modbus_object.set_scaling()
+        modbus_object.set_negative_values()
 
 
 def test_read_telemetry_registers(modbus_object):
@@ -117,10 +139,11 @@ def test_read_and_format_telemetry_registers(modbus_object):
     modbus_object.read_and_format_telemetry_registers()  # Increase 3 more values
 
     telemetry = modbus_object.read_and_format_telemetry_registers()
-    assert type(telemetry) == list
-    assert id(telemetry) != id(modbus_object._ModbusQuery__register_values)
-    expected_values = [0.7, 0.7, 7, 7, 8, 0.8, 9, 9, 9, 9, 9, 0.09, 9, 9, 9, 9]
-    assert telemetry == expected_values
+    assert type(telemetry) == dict
+    assert id(telemetry) != id(modbus_object._ModbusQuery__telemetry)
+    assert telemetry["battery_voltage"] == 0.7
+    assert telemetry["latitude1"] == 9
+    assert telemetry["altitude2"] == 9
 
 
 def test_read_registers_and_read_telemetry_registers_disconnection(start_server, modbus_object):
@@ -145,7 +168,7 @@ def test_read_registers_and_read_telemetry_registers_disconnection(start_server,
         modbus_query.read_telemetry_registers()
     time.sleep(2)
     telemetry = modbus_query.read_and_format_telemetry_registers()
-    assert all(value is None for value in telemetry)
+    assert all(value is None for value in telemetry.values())
 
 
 def test_disconnect(modbus_object):

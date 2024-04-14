@@ -3,7 +3,6 @@ from pymodbus.client.sync import ModbusTcpClient
 import logging
 import re
 
-
 logging.basicConfig(level=logging.DEBUG, filename=f"loggings/modbus_query.log",
                     filemode="a", format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -18,11 +17,19 @@ class ModbusQuery:
             The client is automatically connected to the server upon initialization.
             Even if the connection fails, the socket will be opened when querying registers.
         """
+        self._ModbusQuery__telemetry = None
         self.server_ip = server_ip
         self.server_port = 502
         self.client = ModbusTcpClient(self.server_ip, port=self.server_port)
         self.client.connect()  # even if false when querying the registers the socket will be opened.
         self.__register_values = None
+        self.__telemetry: dict = {"battery_voltage": None, "battery_current": None,
+                                  "battery_power": None, "battery_state_of_charge": None,
+                                  "pv-dc-coupled_power": None, "pv-dc-coupled_current": None,
+                                  "latitude1": None, "latitude2": None, "longitude1": None,
+                                  "longitude2": None, "course": None, "speed": None,
+                                  "gps_fix": None, "gps_number_of_satellites": None,
+                                  "altitude1": None, "altitude2": None}
 
     @property  # Getter
     def server_ip(self) -> str:
@@ -78,6 +85,7 @@ class ModbusQuery:
             raise exe
         else:
             self.__register_values = battery_regs + solar_regs + georef_regs
+            # If you change this order or add more registers you'll need to modify the telemetry dict.
 
     def set_register_values_to_none(self) -> None:
         """
@@ -87,9 +95,17 @@ class ModbusQuery:
         number_of_registers = 16
         self.__register_values = [None] * number_of_registers
 
+    def set_telemetry_from_register_values(self) -> None:
+        """
+        Populates the telemetry dict with the register values.
+        :return: None
+        """
+        self.__telemetry.update(zip(self.__telemetry, self.__register_values))
+
+
     def set_scaling(self) -> None:
         """
-        This function encapsulates the need to scale some sensor readings, as per victron documentation.
+        This method encapsulates the need to scale some sensor readings, as per victron documentation.
         The following registers (to display in the GUI) are scaled:
         battery_voltage -> register_values 0
         battery_current -> register_values 1
@@ -97,9 +113,10 @@ class ModbusQuery:
         speed -> register 11
         :return: None
         """
-        for index in (0, 1, 5):
-            self.__register_values[index] = self.__register_values[index] / 10
-        self.__register_values[11] = self.__register_values[11] / 100
+        sensors_scale_10 = ["battery_voltage", "battery_current", "pv-dc-coupled_current"]
+        for key in sensors_scale_10:
+            self.__telemetry[key] = self.__telemetry[key] / 10
+        self.__telemetry["speed"] = self.__telemetry["speed"] / 100
 
     def set_negative_values(self) -> None:
         """
@@ -111,11 +128,12 @@ class ModbusQuery:
         pv-dc-coupled_current -> register_values 5
         :return: None
         """
-        for index in (1, 2, 5):
-            if self.__register_values[index] >= 32768:
-                self.__register_values[index] = self.__register_values[index] - 65536
+        sensors_support_negative_values = ["battery_current", "battery_power", "pv-dc-coupled_current"]
+        for key in sensors_support_negative_values:
+            if self.__telemetry[key] >= 32768:
+                self.__telemetry[key] = self.__telemetry[key] - 65536
 
-    def read_and_format_telemetry_registers(self) -> list:
+    def read_and_format_telemetry_registers(self) -> dict:
         """
         This method uses read_telemetry_registers, set_scaling, set_negative_values and
         set_register_values_to_none.
@@ -127,10 +145,12 @@ class ModbusQuery:
             self.read_telemetry_registers()
         except (ModbusIOException, ModbusException, ConnectionException, AttributeError):
             self.set_register_values_to_none()
+            self.set_telemetry_from_register_values()
         else:
+            self.set_telemetry_from_register_values()
             self.set_scaling()
             self.set_negative_values()
-        return self.__register_values.copy()
+        return self.__telemetry.copy()
 
     def disconnect(self) -> int:
         """

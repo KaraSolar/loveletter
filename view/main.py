@@ -5,7 +5,6 @@ from .information_frames import InitiateTripFrame,FinishTripFrame
 
 
 class View():
-
     def __init__(self):
         self.root = Root()
         self.root.rowconfigure(0,weight=1,uniform="a")
