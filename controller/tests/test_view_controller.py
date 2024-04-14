@@ -1,5 +1,3 @@
-import time
-
 import pytest
 from controller.view_controller import ViewController
 import threading
@@ -19,14 +17,13 @@ def view_controller() -> ViewController:
     yield trip_start_signal_event, data_base_queue, view_controller
     view.root.destroy()
 
+
 def test_initiate_trip_listener(view_controller):
     trip_start_signal_event, data_base_queue, view_controller = view_controller
     view_controller.initiate_trip_listener()
     assert trip_start_signal_event.is_set()
     message = data_base_queue.get()
-    type = message["type"]
+    type_m = message["type"]
     value = message["value"]
-    assert type == "trip"
+    assert type_m == "trip"
     assert value == 20
-
-
