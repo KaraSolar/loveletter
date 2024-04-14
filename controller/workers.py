@@ -24,7 +24,7 @@ Logs for unexpected exceptions.
 
 import queue
 import threading
-import ttkbootstrap
+import ttkbootstrap as ttk
 import time
 from model.modbus_query import ModbusQuery
 from model.telemetry_database import TelemetryDatabase
@@ -32,7 +32,7 @@ from model.telemetry_database import TelemetryDatabase
 
 class WorkerModbus(threading.Thread):
     def __init__(self, queue_worker_database: queue.Queue, stop_workers_signal: threading.Event,
-                 event_generate: ttkbootstrap.Window.event_generate, trip_mode_flag_signal: threading.Event,
+                 event_generate: ttk.Window.event_generate, trip_mode_flag_signal: threading.Event,
                  queue_view: queue.Queue):
         """Initialize a new thread instance, does not run automatically.
         This new thread will query the modbus every second or 15 seconds depending on signals,

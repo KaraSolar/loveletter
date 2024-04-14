@@ -68,8 +68,7 @@ class ViewController:
 
     def update_battery_power(self, telemetry: dict) -> None:
         battery_power = telemetry.get("battery_power")
-        if battery_power is not None:
-            self.view.data_display_frame.left_pane.battery_power_variable.set(battery_power)
+        self.view.data_display_frame.left_pane.battery_power_variable.set(battery_power)
 
     def update_battery_soc(self, telemetry: dict) -> None:
         battery_soc = telemetry.get("battery_state_of_charge")
@@ -78,8 +77,7 @@ class ViewController:
 
     def update_solar_power(self, telemetry: dict) -> None:
         solar_power = telemetry.get("pv-dc-coupled_power")
-        if solar_power is not None:
-            self.view.data_display_frame.right_pane.solar_power_variable.set(solar_power)
+        self.view.data_display_frame.right_pane.solar_power_variable.set(solar_power)
 
     def update_load_power(self, telemetry: dict) -> None:
         battery_power = telemetry.get("battery_power")
