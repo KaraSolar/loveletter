@@ -1,6 +1,7 @@
 import queue
 import threading
 
+
 class ViewController:
     def __init__(self, view, data_base_queue: queue.Queue,
                  trip_start_signal_event: threading.Event):
