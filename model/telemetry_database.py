@@ -164,7 +164,7 @@ class TelemetryDatabase:
         :raises: ValueError if passenger None, less than 0 or higher than 20.
         :raises: sqlite3.Error if database error.
         """
-        if not trip_passenger_qty:
+        if trip_passenger_qty is None:
             logging.exception(f"trip passenger NULL")
             raise ValueError("passenger can't be NULL")
         if not isinstance(trip_passenger_qty, int):

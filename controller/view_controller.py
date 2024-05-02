@@ -1,6 +1,7 @@
 import queue
 import threading
 
+
 class ViewController:
     def __init__(self, view, data_base_queue: queue.Queue,
                  trip_start_signal_event: threading.Event):
@@ -42,6 +43,8 @@ class ViewController:
 
     def initiate_trip_listener(self):
         passenger_number = self.view.passenger_input_frame.passenger_number_var.get()
+        print(passenger_number)
+        print(self.view.passenger_input_frame.min_passenger)
         self.view.data_display_frame.show_trip_mode()
         self.view.raise_frame("data_display_frame")
         self.data_base_queue.put({"type": "trip", "value": passenger_number})
@@ -67,8 +70,7 @@ class ViewController:
 
     def update_battery_power(self, telemetry: dict) -> None:
         battery_power = telemetry.get("battery_power")
-        if battery_power is not None:
-            self.view.data_display_frame.left_pane.battery_power_variable.set(battery_power)
+        self.view.data_display_frame.left_pane.battery_power_variable.set(battery_power)
 
     def update_battery_soc(self, telemetry: dict) -> None:
         battery_soc = telemetry.get("battery_state_of_charge")
@@ -77,8 +79,7 @@ class ViewController:
 
     def update_solar_power(self, telemetry: dict) -> None:
         solar_power = telemetry.get("pv-dc-coupled_power")
-        if solar_power is not None:
-            self.view.data_display_frame.right_pane.solar_power_variable.set(solar_power)
+        self.view.data_display_frame.right_pane.solar_power_variable.set(solar_power)
 
     def update_load_power(self, telemetry: dict) -> None:
         battery_power = telemetry.get("battery_power")
