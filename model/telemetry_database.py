@@ -53,8 +53,6 @@ and methods to write to both of the telemetry database tables.
 
 import sqlite3
 from datetime import datetime
-import logging
-
 
 
 
@@ -93,7 +91,6 @@ class TelemetryDatabase:
         """
         allowed_strings = ["model/telemetry.db", "model/dev_telemetry.db", "model/test_telemetry.db"]
         if db_name not in allowed_strings:
-            logging.exception("not valid database.")
             raise ValueError("Not a valid database.")
         self._db_name = db_name
 
@@ -108,7 +105,6 @@ class TelemetryDatabase:
             conn = sqlite3.connect(db_name)
             cursor = conn.cursor()
         except sqlite3.Error as exc:
-            logging.exception("Couldn't connect to database.")
             self.close_connection()
             raise sqlite3.Error from exc
         else:
@@ -150,7 +146,6 @@ class TelemetryDatabase:
                                     FOREIGN KEY (tripId) REFERENCES Trip (tripId)
                                 );''')
         except sqlite3.Error as exc:
-            logging.exception("Couldn't connect to database.")
             self.close_connection()
             raise sqlite3.Error from exc
         else:
@@ -166,7 +161,6 @@ class TelemetryDatabase:
         :raises: sqlite3.Error if database error.
         """
         if trip_passenger_qty is None:
-            logging.exception(f"trip passenger NULL")
             raise ValueError("passenger can't be NULL")
         if not isinstance(trip_passenger_qty, int):
             raise ValueError("passenger must be int.")
@@ -179,7 +173,6 @@ class TelemetryDatabase:
             ''', (trip_passenger_qty,))
             row = self.__cursor.lastrowid
         except sqlite3.Error as exc:
-            logging.exception(f"trip passenger incorrect: {trip_passenger_qty}")
             self.close_connection()
             raise sqlite3.Error from exc
         else:
@@ -223,7 +216,6 @@ class TelemetryDatabase:
                   telemetry["gps_fix"], telemetry["gps_number_of_satellites"],
                   telemetry["altitude1"], telemetry["altitude2"]))
         except sqlite3.Error as exe:
-            logging.exception(f"telemetry not in the appropiate format: {telemetry}")
             self.close_connection()
             raise sqlite3.Error from exe
         else:
@@ -244,6 +236,6 @@ class TelemetryDatabase:
         try:
             self.__conn.close()
         except sqlite3.Error as exe:
-            logging.exception("error during closure")
+            pass
         else:
             return 0

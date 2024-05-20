@@ -1,10 +1,7 @@
 from pymodbus.exceptions import ModbusException, ModbusIOException, ConnectionException
 from pymodbus.client.sync import ModbusTcpClient
-import logging
 import re
 
-logging.basicConfig(level=logging.DEBUG, filename=f"loggings/modbus_query.log",
-                    filemode="a", format="%(asctime)s - %(levelname)s - %(message)s")
 
 
 class ModbusQuery:
@@ -62,7 +59,6 @@ class ModbusQuery:
             response = self.client.read_holding_registers(address=address, count=count, unit=unit)
             response = response.registers
         except (ModbusIOException, ModbusException, ConnectionException, AttributeError) as exe:
-            logging.exception("during reading register")
             raise exe
         else:
             return response
@@ -81,7 +77,6 @@ class ModbusQuery:
             solar_regs = self.read_registers(address=850, count=2)  # 850 to 851
             georef_regs = self.read_registers(address=2800, count=10)  # 2800 to 2809
         except (ModbusIOException, ModbusException, ConnectionException, AttributeError) as exe:
-            logging.exception("during reading of telemetry")
             raise exe
         else:
             self.__register_values = battery_regs + solar_regs + georef_regs
