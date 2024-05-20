@@ -1,0 +1,14 @@
+# Config file for loveletter.
+
+database:
+  # name can be "dev_telemetry", "test_telemetry" or "telemetry"
+  # for dev, qa, and prod databases.
+  name: 'telemetry.db'
+
+cerbo_gx:
+  server_ip: '127.0.0.1'
+
+passenger_number:
+  min: 0
+  max: 40
+

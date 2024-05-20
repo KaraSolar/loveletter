@@ -39,12 +39,13 @@ class PassengerInput(ttk.Frame):
         with the selected number of passengers.    
     '''
 
-    def __init__(self, master: ttk.Window, label_font_size:tuple):
+    def __init__(self, master: ttk.Window, label_font_size:tuple, passenger_number_config):
         super().__init__(master)
 
         # ____________Initialize Variables __________
-        self.max_passenger: int = 20
-        self.min_passenger: int = 0
+        self.passenger_number_config = passenger_number_config
+        self.max_passenger: int = self.passenger_number_config["max"]
+        self.min_passenger: int = self.passenger_number_config["min"]
         self.label_font_size: tuple = label_font_size
         self.passenger_number_var: ttk.IntVar = ttk.IntVar(value=self.min_passenger)
 

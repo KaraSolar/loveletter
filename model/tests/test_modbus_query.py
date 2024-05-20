@@ -146,6 +146,7 @@ def test_read_and_format_telemetry_registers(modbus_object):
     assert telemetry["altitude2"] == 9
 
 
+# Nesting two functions for this test. --> ask chatgpt how to organize an integration test.
 def test_read_registers_and_read_telemetry_registers_disconnection(start_server, modbus_object):
     """
     Integration test.

@@ -56,8 +56,7 @@ from datetime import datetime
 import logging
 
 
-logging.basicConfig(level=logging.DEBUG, filename=f"loggings/telemetry_database.log",
-                    filemode="a", format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 
 class TelemetryDatabase:
@@ -65,13 +64,15 @@ class TelemetryDatabase:
     As per sqlite3 api documentation: Note The context manager neither implicitly opens a new
     transaction nor closes the connection.
     """
-    def __init__(self, db_name: str = "model/telemetry.db"):
+    def __init__(self, db_name: str,
+                 passenger_number_config: dict):
         """
         Instantiate the connection to the database and create the tables.
         :param db_name: str expects a string constraint to "model/telemetry.db",
         "model/dev_telemetry.db", "model/test_telemetry.db" won't admit other values
         """
         self.db_name = db_name
+        self.passenger_number_config = passenger_number_config
         self.__conn, self.__cursor = self.connect_to_database(self.db_name)
         self.create_tables()
         self.__trip_id = None
@@ -159,9 +160,9 @@ class TelemetryDatabase:
         """
         Inserts a new trip row to the Trip table with the number of passengers given.
         When successful assigns the attribute trip_id to the trip id.
-        :param trip_passenger_qty: int greater than 0 but lower than 20, required
+        :param trip_passenger_qty: int greater than 0 but lower than config file, required
         :return: None
-        :raises: ValueError if passenger None, less than 0 or higher than 20.
+        :raises: ValueError if passenger None, less than or higher than config file.
         :raises: sqlite3.Error if database error.
         """
         if trip_passenger_qty is None:
@@ -169,8 +170,8 @@ class TelemetryDatabase:
             raise ValueError("passenger can't be NULL")
         if not isinstance(trip_passenger_qty, int):
             raise ValueError("passenger must be int.")
-        if trip_passenger_qty > 20 or trip_passenger_qty < 0:
-            logging.exception(f"trip passenger incorrect: {trip_passenger_qty}")
+        if (trip_passenger_qty > self.passenger_number_config["max"]
+                or trip_passenger_qty < self.passenger_number_config["min"]):
             raise ValueError("passengers not in range")
         try:
             self.__cursor.execute('''
