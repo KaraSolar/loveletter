@@ -53,8 +53,7 @@ and methods to write to both of the telemetry database tables.
 
 import sqlite3
 from datetime import datetime
-
-
+import re
 
 
 class TelemetryDatabase:
@@ -89,8 +88,8 @@ class TelemetryDatabase:
         Raises:
             ValueError: If the database name is invalid.
         """
-        allowed_strings = ["model/telemetry.db", "model/dev_telemetry.db", "model/test_telemetry.db"]
-        if db_name not in allowed_strings:
+        pattern = r"model/\d{4}_\d{2}_\d{2}_telemetry.db|model/dev_telemetry.db|model/test_telemetry.db"
+        if not re.search(pattern=pattern, string=db_name):
             raise ValueError("Not a valid database.")
         self._db_name = db_name
 
@@ -181,7 +180,7 @@ class TelemetryDatabase:
 
     def insert_telemetry(self, telemetry: dict) -> None:
         """
-        Insert the telemetry data into the database. the telemetry must be in the appropiate format
+        Insert the telemetry data into the database. the telemetry must be in the appropriate format
         as the dictionary returned by ModbusQuery.read_and_format_telemetry_registers
         :param telemetry: the telemetry dictionary that returns the ModbusQuery class.
         :return: None

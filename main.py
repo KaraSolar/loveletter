@@ -1,12 +1,15 @@
 from controller.main import Controller
 from view.main import View
 from config.config_reader import read_config
+from datetime import datetime
+
 
 config = read_config()
 db_name_config = config["database"]["name"]
+if db_name_config == "telemetry.db":
+    db_name_config = datetime.now().strftime("%Y_%m_%d_") + db_name_config
 server_ip_config = config["cerbo_gx"]["server_ip"]
 passenger_number_config: dict = config["passenger_number"]
-
 
 
 if __name__ == "__main__":
