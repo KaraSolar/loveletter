@@ -60,7 +60,7 @@ class WorkerModbus(threading.Thread):
 
         :return: 0 when terminated.
         """
-        modbus_query = ModbusQuery(self.server_ip_config)  # Initialize in the new thread to avoid race conditions.
+        modbus_query = ModbusQuery(server_ip=self.server_ip_config)  # Initialize in the new thread to avoid race conditions.
         while not self.stop_workers_signal.is_set():
             telemetry_modbus: dict = modbus_query.read_and_format_telemetry_registers()
             self.queue_worker_database.put({"type": "telemetry", "value": telemetry_modbus})
