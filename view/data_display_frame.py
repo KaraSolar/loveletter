@@ -1,6 +1,5 @@
 import time
 import ttkbootstrap as ttk
-from ttkbootstrap.dialogs import Messagebox
 
 
 class DataDisplayFrame(ttk.Frame):
@@ -153,12 +152,6 @@ class CenterPane(ttk.Frame):
         self.start_trip_button.grid_forget()
         self.speed_frame.grid(row=1, column=0, sticky="nsew")
         self.end_trip_button.grid(row=2, column=0, sticky="new")
-
-
-    def show_message_box_end_trip(self) -> Messagebox:
-        message_to_display: str = "¿Está seguro que quiere terminar el viaje?"
-        return Messagebox.show_question(message = message_to_display, title="Terminar Viaje",
-                                        buttons=['Si:success','No:light'])
 
 
 class RightPane(ttk.Frame):
