@@ -81,7 +81,7 @@ class PassengerInput(ttk.Frame):
         # _______________Passenger Indicator______________
         self.passenger_number_label:ttk.Label = ttk.Label(master=self,
                                           textvariable = self.passenger_number_var,
-                                          font=self.label_font_size)
+                                          font=("Digital-7", 40))
         self.passenger_number_label.grid(row=1, column=1, sticky="ns")
 
 
