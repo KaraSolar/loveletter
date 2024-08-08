@@ -38,6 +38,7 @@ class Controller:
 
     def closing_keys(self):
         self.view.root.bind('<Escape>', self.close_on_escape)
+        self.view.root.protocol("WM_DELETE_WINDOW", self.close_on_escape)
 
     def close_on_escape(self, event=None):
         print("cerrando el programa...")

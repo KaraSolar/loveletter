@@ -8,7 +8,7 @@ class InitiateTripFrame(ttk.Frame):
         self.rowconfigure((0,1), weight=1, uniform="a")
         self.initiate_trip_text_var = ttk.StringVar()
         self.initiate_trip_label = ttk.Label(master=self,
-                                             textvariable=self.initiate_trip_text_var)
+                                             textvariable=self.initiate_trip_text_var, font=("Digital-7", 21))
         self.initiate_trip_label.grid(row=0, column=0, columnspan=2)
         self.yes_no_buttons()
 
@@ -35,7 +35,7 @@ class FinishTripFrame(ttk.Frame):
         self.columnconfigure((0,1), weight= 1, uniform="a")
         self.rowconfigure((0,1), weight=1, uniform="a")
         self.end_trip_label = ttk.Label(master=self,
-                                        text="Está seguro que quiere terminar el viaje?")
+                                        text="Está seguro que quiere terminar el viaje?", font=("Digital-7", 22))
         self.end_trip_label.grid(row=0, column=0, columnspan=2)
         self.yes_no_buttons()
 
