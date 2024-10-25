@@ -1,15 +1,24 @@
 import ttkbootstrap as ttk
 
 class InitiateTripFrame(ttk.Frame):
-    def __init__(self, master: ttk.Window, passenger_number_var: ttk.IntVar):
+    def __init__(self, master: ttk.Window, passenger_number_var: ttk.IntVar, trip_purposes_var: ttk.StringVar):
         super().__init__(master)
         self.passenger_number_var = passenger_number_var
+        self.trip_purposes_var = trip_purposes_var
         self.columnconfigure((0,1), weight= 1, uniform="a")
         self.rowconfigure((0,1), weight=1, uniform="a")
-        self.initiate_trip_text_var = ttk.StringVar()
-        self.initiate_trip_label = ttk.Label(master=self,
-                                             textvariable=self.initiate_trip_text_var, font=("Digital-7", 21))
-        self.initiate_trip_label.grid(row=0, column=0, columnspan=2)
+        self.initiate_trip_text_var_pass_number = ttk.StringVar()
+        self.initiate_trip_text_var_trip_purpose = ttk.StringVar()
+        self.labels_frame = ttk.Frame(self)
+        self.labels_frame.columnconfigure(0, weight=1, uniform="a")
+        self.labels_frame.rowconfigure((0,1), weight=1, uniform="a")
+        self.labels_frame.grid(row=0,column=0,columnspan=2,sticky="nsew")
+        self.initiate_trip_label = ttk.Label(master=self.labels_frame,
+                                             textvariable=self.initiate_trip_text_var_pass_number, font=("Digital-7", 21))
+        self.initiate_trip_label.grid(row=0, column=0,sticky="s")
+        self.initiate_trip_label = ttk.Label(master=self.labels_frame,
+                                             textvariable=self.initiate_trip_text_var_trip_purpose, font=("Digital-7", 21))
+        self.initiate_trip_label.grid(row=1, column=0)
         self.yes_no_buttons()
 
     def yes_no_buttons(self):
@@ -26,8 +35,10 @@ class InitiateTripFrame(ttk.Frame):
         self.no_button.grid(row=1,column=0,sticky="ne", padx=50)
 
     def set_initiate_trip_text_var(self):
-        string = f"Está seguro que quiere iniciar el viaje con {self.passenger_number_var.get()} pasajeros?"
-        self.initiate_trip_text_var.set(string)
+        string_pass = f"Está seguro que quiere iniciar el viaje con {self.passenger_number_var.get()} pasajeros?"
+        self.initiate_trip_text_var_pass_number.set(string_pass)
+        string_trip_purpose =  f"Y motivo de viaje: {self.trip_purposes_var.get()}?"
+        self.initiate_trip_text_var_trip_purpose.set(string_trip_purpose)
 
 class FinishTripFrame(ttk.Frame):
     def __init__(self, master: ttk.Window):

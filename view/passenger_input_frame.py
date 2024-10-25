@@ -3,6 +3,7 @@ This module contains the class PassengerInput, part of the VIEW.
 '''
 
 import ttkbootstrap as ttk
+from ttkbootstrap.dialogs.dialogs import Messagebox
 
 class PassengerInput(ttk.Frame):
     '''
@@ -38,20 +39,26 @@ class PassengerInput(ttk.Frame):
         with the selected number of passengers.    
     '''
 
-    def __init__(self, master: ttk.Window, label_font_size:tuple, passenger_number_config):
+    def __init__(self, master: ttk.Window, label_font_size:tuple, passenger_number_config, trip_purposes:list):
         super().__init__(master)
 
         # ____________Initialize Variables __________
         self.passenger_number_config = passenger_number_config
+        self.trip_purposes = trip_purposes
         self.max_passenger: int = self.passenger_number_config["max"]
         self.min_passenger: int = self.passenger_number_config["min"]
         self.label_font_size: tuple = label_font_size
         self.passenger_number_var: ttk.IntVar = ttk.IntVar(value=self.min_passenger)
+        self.trip_purposes_var: ttk.StringVar = ttk.StringVar(value='Escoja un motivo de viaje.')
 
         # ____________FrameConfiguration_____________
         self.columnconfigure((0,1,2), weight= 1, uniform="a")
 
         self.rowconfigure((0,1,2), weight=1, uniform="a")
+        self.trip_purpose_and_go_back_frame = ttk.Frame(self)
+        self.trip_purpose_and_go_back_frame.columnconfigure(0, weight=1, uniform="a")
+        self.trip_purpose_and_go_back_frame.rowconfigure(0,weight=1, uniform="a")
+        self.trip_purpose_and_go_back_frame.rowconfigure(1, weight=3, uniform="a")
 
         self.passenger_number_label_and_buttons()
         self.action_buttons()
@@ -84,6 +91,15 @@ class PassengerInput(ttk.Frame):
         self.passenger_number_label.grid(row=1, column=1, sticky="ns")
 
 
+        # _______________Passenger Indicator______________
+        self.trip_purposes_combobox: ttk.Combobox = ttk.Combobox(master=self.trip_purpose_and_go_back_frame,
+                                                                textvariable=self.trip_purposes_var,
+                                                                values=tuple(self.trip_purposes),
+                                                                bootstyle="info",
+                                                                font=("Digital-7", 20))
+        self.trip_purposes_combobox.grid(row=1, column=0, sticky = "sew", pady=(0,20))
+        self.trip_purpose_and_go_back_frame.grid(row=0, column=1, sticky="nsew")
+
     def action_buttons(self) -> None:
         # _______________Start Trip________________________
         self.start_trip_button:ttk.Button = ttk.Button(master=self,
@@ -93,10 +109,10 @@ class PassengerInput(ttk.Frame):
 
 
         # _______________Go back _________________________
-        self.go_back_button:ttk.Button = ttk.Button(self,
+        self.go_back_button:ttk.Button = ttk.Button(master=self.trip_purpose_and_go_back_frame,
                                          text="Regresar",
                                          style="info.TButton")
-        self.go_back_button.grid(row=0, column=1, sticky="ew")
+        self.go_back_button.grid(row=0, column=0, sticky="new", pady=(25,0), rowspan=2)
 
 
     # ________________command methods_____________________
@@ -105,8 +121,25 @@ class PassengerInput(ttk.Frame):
         if n > self.min_passenger:
             self.passenger_number_var.set(n-1)
 
-
     def increase_passenger_number(self) ->None:
         n:int = self.passenger_number_var.get()
         if n < self.max_passenger:
             self.passenger_number_var.set(n+1)
+
+    # ________________validate combobox_____________________
+    def trip_purpose_validator(self):
+        if self.trip_purposes_var.get() in self.trip_purposes:
+            return True
+        else:
+            Messagebox.show_error(message='Por favor seleccione un motivo de viaje valido.')
+
+'''
+TO DO:
+1. Find a way to validate the combobox selection, must be within the purpose_trip values --> done
+2. Find a way to safely GET that value (you must assign it to a tk variable cause this are the 
+thread safe structure within tkinter --> done
+3. Display this in the "information" frame --> done
+4. Parse this value to controller
+5. Controller must parse this value on trip insert
+6. Add this to the DB.
+'''
