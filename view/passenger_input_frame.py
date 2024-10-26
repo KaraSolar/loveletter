@@ -39,17 +39,17 @@ class PassengerInput(ttk.Frame):
         with the selected number of passengers.    
     '''
 
-    def __init__(self, master: ttk.Window, label_font_size:tuple, passenger_number_config, trip_purposes:list):
+    def __init__(self, master: ttk.Window, label_font_size:tuple, passenger_number_config, trip_purposes_config: list):
         super().__init__(master)
 
         # ____________Initialize Variables __________
         self.passenger_number_config = passenger_number_config
-        self.trip_purposes = trip_purposes
+        self.trip_purposes_config = trip_purposes_config
         self.max_passenger: int = self.passenger_number_config["max"]
         self.min_passenger: int = self.passenger_number_config["min"]
         self.label_font_size: tuple = label_font_size
         self.passenger_number_var: ttk.IntVar = ttk.IntVar(value=self.min_passenger)
-        self.trip_purposes_var: ttk.StringVar = ttk.StringVar(value='Escoja un motivo de viaje.')
+        self.trip_purpose_var: ttk.StringVar = ttk.StringVar(value='Escoja un motivo de viaje.')
 
         # ____________FrameConfiguration_____________
         self.columnconfigure((0,1,2), weight= 1, uniform="a")
@@ -93,8 +93,8 @@ class PassengerInput(ttk.Frame):
 
         # _______________Passenger Indicator______________
         self.trip_purposes_combobox: ttk.Combobox = ttk.Combobox(master=self.trip_purpose_and_go_back_frame,
-                                                                textvariable=self.trip_purposes_var,
-                                                                values=tuple(self.trip_purposes),
+                                                                textvariable=self.trip_purpose_var,
+                                                                values=self.trip_purposes_config,
                                                                 bootstyle="info",
                                                                 font=("Digital-7", 20))
         self.trip_purposes_combobox.grid(row=1, column=0, sticky = "sew", pady=(0,20))
@@ -126,12 +126,11 @@ class PassengerInput(ttk.Frame):
         if n < self.max_passenger:
             self.passenger_number_var.set(n+1)
 
-    # ________________validate combobox_____________________
     def trip_purpose_validator(self):
-        if self.trip_purposes_var.get() in self.trip_purposes:
+        if self.trip_purpose_var.get() in self.trip_purposes_config:
             return True
         else:
-            Messagebox.show_error(message='Por favor seleccione un motivo de viaje valido.')
+            print('invalido')
 
 '''
 TO DO:
@@ -142,4 +141,5 @@ thread safe structure within tkinter --> done
 4. Parse this value to controller
 5. Controller must parse this value on trip insert
 6. Add this to the DB.
+7. Change the Messagebox for a frame (linux doesnt like messageboxes).
 '''

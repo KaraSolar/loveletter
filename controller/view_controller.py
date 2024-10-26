@@ -43,10 +43,12 @@ class ViewController:
             command=self.end_trip_listener)
 
     def initiate_trip_listener(self):
-        passenger_number = self.view.passenger_input_frame.passenger_number_var.get()
+        trip_passenger_qty = self.view.passenger_input_frame.passenger_number_var.get()
+        trip_purpose = self.view.passenger_input_frame.trip_purpose_var.get()
         self.view.data_display_frame.show_trip_mode()
         self.view.raise_frame("data_display_frame")
-        self.data_base_queue.put({"type": "trip", "value": passenger_number})
+        self.data_base_queue.put({"type": "trip", "value": {"passenger_number": trip_passenger_qty,
+                                  "trip_purpose": trip_purpose}})
         self.trip_start_signal_event.set()
 
     def end_trip_listener(self):
