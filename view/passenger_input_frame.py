@@ -125,16 +125,3 @@ class PassengerInput(ttk.Frame):
         n:int = self.passenger_number_var.get()
         if n < self.max_passenger:
             self.passenger_number_var.set(n+1)
-
-'''
-TO DO:
-1. Find a way to validate the combobox selection, must be within the purpose_trip values --> done.
-2. Find a way to safely GET that value (you must assign it to a tk variable cause this are the 
-thread safe structure within tkinter --> done.
-3. Display this in the "information" frame --> done.
-4. Parse this value to controller --> done.
-5. Controller must parse this value on trip insert --> done.
-6. Add this to the DB. --> done.
-7. Insert trip purpose --> done.
-8. Change the Messagebox for a frame (linux doesnt like messageboxes).
-'''
