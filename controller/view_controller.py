@@ -10,6 +10,7 @@ class ViewController:
         self.trip_start_signal_event = trip_start_signal_event
         self.configure_data_display_buttons()
         self.configure_passenger_input_buttons()
+        self.configure_checklist_frame_input_buttons()
         self.configure_initiate_trip_frame_buttons()
         self.configure_finish_trip_frame_buttons()
 
@@ -24,6 +25,11 @@ class ViewController:
             command=self.change_initiate_trip_frame)
         self.view.passenger_input_frame.go_back_button.config(
             command=lambda: self.view.raise_frame("data_display_frame"))
+
+    def configure_checklist_frame_input_buttons(self):
+        self.view.checklist_frame.go_back_button.config(
+            command=lambda: self.view.lower_frame("checklist_frame")
+        )
 
     def change_initiate_trip_frame(self):
         if self.view.trip_purpose_validator():

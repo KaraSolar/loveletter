@@ -14,6 +14,7 @@ class Root(ttk.Window):
         self.indicator_font: tuple = ("Digital-7", 18)
         style = ttk.Style()
         style.configure('info.TButton', font=self.title_font)
+        style.configure('success.TCheckbutton', font=self.title_font)
         self.option_add("*TCombobox*Listbox*Font", self.title_font)
 
     def get_screen_resolution(self) -> tuple:

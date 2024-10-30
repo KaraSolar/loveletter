@@ -2,6 +2,7 @@ from .root import Root
 from .passenger_input_frame import PassengerInput
 from .data_display_frame import DataDisplayFrame
 from .information_frames import InitiateTripFrame,FinishTripFrame, TripPurposeWarning
+from .checklist_frame import ChecklistFrame
 
 
 class View():
@@ -20,14 +21,16 @@ class View():
                                                      self.passenger_input_frame.trip_purpose_var)
         self.trip_purpose_warning = TripPurposeWarning(self.root,
                                                        trip_purposes_var=self.passenger_input_frame.trip_purpose_var)
-        self.trip_purpose_warning.close_warning_button.config(command= lambda: self.raise_frame(frame="passenger_input_frame"))
+        self.trip_purpose_warning.close_warning_button.config(command= lambda: self.lower_frame(frame="trip_purpose_warning"))
         self.finish_trip_frame = FinishTripFrame(self.root)
         self.data_display_frame = DataDisplayFrame(self.root)
+        self.checklist_frame = ChecklistFrame(self.root)
         self.frames["passenger_input_frame"] = self.passenger_input_frame
         self.frames["data_display_frame"] = self.data_display_frame
         self.frames["initiate_trip_frame"] = self.initiate_trip_frame
         self.frames["finish_trip_frame"] = self.finish_trip_frame
         self.frames["trip_purpose_warning"] = self.trip_purpose_warning
+        self.frames["checklist_frame"] = self.checklist_frame
 
         for value in self.frames.values():
             value.grid(row=0,column=0,sticky="nesw")
@@ -46,3 +49,6 @@ class View():
         else:
             self.trip_purpose_warning.set_warning_text_var()
             self.raise_frame(frame="trip_purpose_warning")
+
+    def lower_frame(self, frame):
+        self.frames[frame].lower()
