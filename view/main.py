@@ -5,13 +5,15 @@ from .information_frames import InitiateTripFrame,FinishTripFrame
 
 
 class View():
-    def __init__(self):
+    def __init__(self, passenger_number_config):
+        self.passenger_number_config = passenger_number_config
         self.root = Root()
         self.root.rowconfigure(0,weight=1,uniform="a")
         self.root.columnconfigure(0,weight=1,uniform="a")
 
         self.frames = {}
-        self.passenger_input_frame = PassengerInput(self.root, self.root.indicator_font)
+        self.passenger_input_frame = PassengerInput(self.root, self.root.indicator_font,
+                                                    self.passenger_number_config)
         self.initiate_trip_frame = InitiateTripFrame(self.root, self.passenger_input_frame.passenger_number_var)
         self.finish_trip_frame = FinishTripFrame(self.root)
         self.data_display_frame = DataDisplayFrame(self.root)

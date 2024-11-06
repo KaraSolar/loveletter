@@ -3,7 +3,6 @@ This module contains the class PassengerInput, part of the VIEW.
 '''
 
 import ttkbootstrap as ttk
-from ttkbootstrap.dialogs import Messagebox
 
 class PassengerInput(ttk.Frame):
     '''
@@ -39,12 +38,13 @@ class PassengerInput(ttk.Frame):
         with the selected number of passengers.    
     '''
 
-    def __init__(self, master: ttk.Window, label_font_size:tuple):
+    def __init__(self, master: ttk.Window, label_font_size:tuple, passenger_number_config):
         super().__init__(master)
 
         # ____________Initialize Variables __________
-        self.max_passenger: int = 20
-        self.min_passenger: int = 0
+        self.passenger_number_config = passenger_number_config
+        self.max_passenger: int = self.passenger_number_config["max"]
+        self.min_passenger: int = self.passenger_number_config["min"]
         self.label_font_size: tuple = label_font_size
         self.passenger_number_var: ttk.IntVar = ttk.IntVar(value=self.min_passenger)
 
@@ -80,7 +80,7 @@ class PassengerInput(ttk.Frame):
         # _______________Passenger Indicator______________
         self.passenger_number_label:ttk.Label = ttk.Label(master=self,
                                           textvariable = self.passenger_number_var,
-                                          font=self.label_font_size)
+                                          font=("Digital-7", 40))
         self.passenger_number_label.grid(row=1, column=1, sticky="ns")
 
 
@@ -110,10 +110,3 @@ class PassengerInput(ttk.Frame):
         n:int = self.passenger_number_var.get()
         if n < self.max_passenger:
             self.passenger_number_var.set(n+1)
-
-
-    def show_message_box_initiate_trip(self) -> Messagebox:
-        n:int = self.passenger_number_var.get()
-        message_to_display:str = f"¿Está seguro que quiere iniciar el viaje con {n} pasajeros?"
-        return Messagebox.show_question(message = message_to_display, title="Iniciar Viaje",
-                                        buttons=['Si:success','No:light'])

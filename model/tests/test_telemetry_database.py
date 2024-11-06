@@ -147,6 +147,7 @@ def test_insert_telemetry(telemetry_database_object):
     conn.close()
 
 
+# Nesting some functions here.
 def test_trip_mode_telemetry(telemetry_database_object):
     """
     Integration test.
@@ -160,12 +161,12 @@ def test_trip_mode_telemetry(telemetry_database_object):
                  "longitude2": 9, "course": 9, "speed": 0.09,
                  "gps_fix": 9, "gps_number_of_satellites": 9,
                  "altitude1": 9, "altitude2": 9}
-    telemetry_database_object.insert_telemetry(telemetry)
+    telemetry_database_object.insert_telemetry(telemetry) # replaced with a for loop.
     telemetry_database_object.insert_telemetry(telemetry)
     telemetry_database_object.insert_telemetry(telemetry)
     telemetry_database_object.insert_telemetry(telemetry)
     telemetry_database_object.close_connection()
-    conn = sqlite3.connect("model/test_telemetry.db")
+    conn = sqlite3.connect("model/test_telemetry.db") # this can be a function.
     cursor = conn.cursor()
     cursor.execute("SELECT tripPassengerQty, tripId FROM Trip WHERE tripId = (SELECT MAX(tripId) FROM Trip)")
     result_trip = cursor.fetchall()

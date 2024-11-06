@@ -33,7 +33,7 @@ from model.telemetry_database import TelemetryDatabase
 class WorkerModbus(threading.Thread):
     def __init__(self, queue_worker_database: queue.Queue, stop_workers_signal: threading.Event,
                  event_generate: ttk.Window.event_generate, trip_mode_flag_signal: threading.Event,
-                 queue_view: queue.Queue):
+                 queue_view: queue.Queue, server_ip_config: str):
         """Initialize a new thread instance, does not run automatically.
         This new thread will query the modbus every second or 15 seconds depending on signals,
         put the telemetry data in two queues and listen for command signals.
@@ -50,6 +50,7 @@ class WorkerModbus(threading.Thread):
         self.event_generate = event_generate
         self.trip_mode_flag_signal = trip_mode_flag_signal
         self.queue_view = queue_view
+        self.server_ip_config = server_ip_config
 
     def run(self) -> int:
         """Start the querying loop in the WorkerModbus thread.
@@ -59,12 +60,13 @@ class WorkerModbus(threading.Thread):
 
         :return: 0 when terminated.
         """
-        modbus_query = ModbusQuery()  # Initialize in the new thread to avoid race conditions.
+        modbus_query = ModbusQuery(server_ip=self.server_ip_config)  # Initialize in the new thread to avoid race conditions.
         while not self.stop_workers_signal.is_set():
             telemetry_modbus: dict = modbus_query.read_and_format_telemetry_registers()
             self.queue_worker_database.put({"type": "telemetry", "value": telemetry_modbus})
             self.queue_view.put(telemetry_modbus)
-            self.event_generate("<<update_view>>")
+            if not self.stop_workers_signal.is_set():
+                self.event_generate("<<update_view>>")  # Blocking event tkinter events are not thread safe.
             if self.trip_mode_flag_signal.is_set():
                 time.sleep(1)
             else:
@@ -82,10 +84,11 @@ class WorkerDatabase(threading.Thread):
         queue_worker_database (queue.Queue, required): a queue object used to send telemetry data across threads.
     """
     def __init__(self, queue_worker_database: queue.Queue,
-                 db_name: str):
+                 db_name: str, passenger_number_config: dict):
         super().__init__(daemon=False)
         self.queue_worker_database = queue_worker_database
         self.db_name = db_name
+        self.passenger_number_config = passenger_number_config
 
     def run(self):
         """Start the queue listening.
@@ -95,7 +98,8 @@ class WorkerDatabase(threading.Thread):
 
         :return: 0 when terminated.
         """
-        telemetry_database = TelemetryDatabase(self.db_name)  # Initialize within the new thread otherwise race conditions.
+        telemetry_database = TelemetryDatabase(self.db_name,
+                                               passenger_number_config=self.passenger_number_config)  # Initialize within the new thread otherwise race conditions.
         while True:
             message = self.queue_worker_database.get()
             message_type = message["type"]

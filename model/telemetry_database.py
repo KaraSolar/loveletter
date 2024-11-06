@@ -53,11 +53,7 @@ and methods to write to both of the telemetry database tables.
 
 import sqlite3
 from datetime import datetime
-import logging
-
-
-logging.basicConfig(level=logging.DEBUG, filename=f"loggings/telemetry_database.log",
-                    filemode="a", format="%(asctime)s - %(levelname)s - %(message)s")
+import re
 
 
 class TelemetryDatabase:
@@ -65,13 +61,15 @@ class TelemetryDatabase:
     As per sqlite3 api documentation: Note The context manager neither implicitly opens a new
     transaction nor closes the connection.
     """
-    def __init__(self, db_name: str = "model/telemetry.db"):
+    def __init__(self, db_name: str,
+                 passenger_number_config: dict):
         """
         Instantiate the connection to the database and create the tables.
         :param db_name: str expects a string constraint to "model/telemetry.db",
         "model/dev_telemetry.db", "model/test_telemetry.db" won't admit other values
         """
         self.db_name = db_name
+        self.passenger_number_config = passenger_number_config
         self.__conn, self.__cursor = self.connect_to_database(self.db_name)
         self.create_tables()
         self.__trip_id = None
@@ -90,9 +88,8 @@ class TelemetryDatabase:
         Raises:
             ValueError: If the database name is invalid.
         """
-        allowed_strings = ["model/telemetry.db", "model/dev_telemetry.db", "model/test_telemetry.db"]
-        if db_name not in allowed_strings:
-            logging.exception("not valid database.")
+        pattern = r"model/\d{4}_\d{2}_\d{2}_telemetry.db|model/dev_telemetry.db|model/test_telemetry.db"
+        if not re.search(pattern=pattern, string=db_name):
             raise ValueError("Not a valid database.")
         self._db_name = db_name
 
@@ -107,7 +104,6 @@ class TelemetryDatabase:
             conn = sqlite3.connect(db_name)
             cursor = conn.cursor()
         except sqlite3.Error as exc:
-            logging.exception("Couldn't connect to database.")
             self.close_connection()
             raise sqlite3.Error from exc
         else:
@@ -149,7 +145,6 @@ class TelemetryDatabase:
                                     FOREIGN KEY (tripId) REFERENCES Trip (tripId)
                                 );''')
         except sqlite3.Error as exc:
-            logging.exception("Couldn't connect to database.")
             self.close_connection()
             raise sqlite3.Error from exc
         else:
@@ -159,18 +154,17 @@ class TelemetryDatabase:
         """
         Inserts a new trip row to the Trip table with the number of passengers given.
         When successful assigns the attribute trip_id to the trip id.
-        :param trip_passenger_qty: int greater than 0 but lower than 20, required
+        :param trip_passenger_qty: int greater than 0 but lower than config file, required
         :return: None
-        :raises: ValueError if passenger None, less than 0 or higher than 20.
+        :raises: ValueError if passenger None, less than or higher than config file.
         :raises: sqlite3.Error if database error.
         """
         if trip_passenger_qty is None:
-            logging.exception(f"trip passenger NULL")
             raise ValueError("passenger can't be NULL")
         if not isinstance(trip_passenger_qty, int):
             raise ValueError("passenger must be int.")
-        if trip_passenger_qty > 20 or trip_passenger_qty < 0:
-            logging.exception(f"trip passenger incorrect: {trip_passenger_qty}")
+        if (trip_passenger_qty > self.passenger_number_config["max"]
+                or trip_passenger_qty < self.passenger_number_config["min"]):
             raise ValueError("passengers not in range")
         try:
             self.__cursor.execute('''
@@ -178,7 +172,6 @@ class TelemetryDatabase:
             ''', (trip_passenger_qty,))
             row = self.__cursor.lastrowid
         except sqlite3.Error as exc:
-            logging.exception(f"trip passenger incorrect: {trip_passenger_qty}")
             self.close_connection()
             raise sqlite3.Error from exc
         else:
@@ -187,7 +180,7 @@ class TelemetryDatabase:
 
     def insert_telemetry(self, telemetry: dict) -> None:
         """
-        Insert the telemetry data into the database. the telemetry must be in the appropiate format
+        Insert the telemetry data into the database. the telemetry must be in the appropriate format
         as the dictionary returned by ModbusQuery.read_and_format_telemetry_registers
         :param telemetry: the telemetry dictionary that returns the ModbusQuery class.
         :return: None
@@ -222,7 +215,6 @@ class TelemetryDatabase:
                   telemetry["gps_fix"], telemetry["gps_number_of_satellites"],
                   telemetry["altitude1"], telemetry["altitude2"]))
         except sqlite3.Error as exe:
-            logging.exception(f"telemetry not in the appropiate format: {telemetry}")
             self.close_connection()
             raise sqlite3.Error from exe
         else:
@@ -243,6 +235,6 @@ class TelemetryDatabase:
         try:
             self.__conn.close()
         except sqlite3.Error as exe:
-            logging.exception("error during closure")
+            pass
         else:
             return 0

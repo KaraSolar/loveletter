@@ -40,6 +40,7 @@ def data_insert() -> dict:
     yield telemetry
 
 
+# Refactor nested functions.
 def test_telemetry_insertion(queue_worker_database, worker_database, data_insert):
     telemetry = data_insert
     queue_worker_database = queue_worker_database
@@ -58,6 +59,7 @@ def test_telemetry_insertion(queue_worker_database, worker_database, data_insert
     conn.close()
 
 
+# refactor nesting.
 def test_trip_insertion(queue_worker_database, worker_database):
     trip_passenger_qty = 20
     queue_worker_database = queue_worker_database
