@@ -62,7 +62,7 @@ class TelemetryDatabase:
     transaction nor closes the connection.
     """
     def __init__(self, db_name: str,
-                 passenger_number_config: dict):
+                 passenger_number_config: dict, trip_purposes_config: list):
         """
         Instantiate the connection to the database and create the tables.
         :param db_name: str expects a string constraint to "model/telemetry.db",
@@ -70,6 +70,7 @@ class TelemetryDatabase:
         """
         self.db_name = db_name
         self.passenger_number_config = passenger_number_config
+        self.trip_purposes_config = trip_purposes_config
         self.__conn, self.__cursor = self.connect_to_database(self.db_name)
         self.create_tables()
         self.__trip_id = None
@@ -118,7 +119,8 @@ class TelemetryDatabase:
         try:
             self.__cursor.execute('''CREATE TABLE IF NOT EXISTS Trip (
                                 tripId           INTEGER PRIMARY KEY AUTOINCREMENT,
-                                tripPassengerQty INTEGER NOT NULL
+                                tripPassengerQty INTEGER NOT NULL,
+                                tripPurpose      TEXT    NOT NULL
                                 );
                                 ''')
 
@@ -150,14 +152,13 @@ class TelemetryDatabase:
         else:
             self.__conn.commit()
 
-    def insert_trip(self, trip_passenger_qty: int) -> None:
+    def trip_insert_values_validation(self, trip_passenger_qty, trip_purpose):
         """
-        Inserts a new trip row to the Trip table with the number of passengers given.
-        When successful assigns the attribute trip_id to the trip id.
-        :param trip_passenger_qty: int greater than 0 but lower than config file, required
+        Validates fields for trip insertion.
+        :param trip_passenger_qty: dict greater than 0 but lower than config file, required.
+        :param trip_purpose: str must be one of the values defined in config.yml
         :return: None
         :raises: ValueError if passenger None, less than or higher than config file.
-        :raises: sqlite3.Error if database error.
         """
         if trip_passenger_qty is None:
             raise ValueError("passenger can't be NULL")
@@ -166,10 +167,25 @@ class TelemetryDatabase:
         if (trip_passenger_qty > self.passenger_number_config["max"]
                 or trip_passenger_qty < self.passenger_number_config["min"]):
             raise ValueError("passengers not in range")
+        if trip_purpose not in self.trip_purposes_config:
+            raise ValueError("trip purpose not correct")
+
+    def insert_trip(self, value: dict) -> None:
+        """
+        Inserts a new trip row to the Trip table with the number of passengers given.
+        When successful assigns the attribute trip_id to the trip id.
+        :param value: dict that contains passenger quantity and the trip purpose.
+        :param value: dict
+        :return: None
+        :raises: ValueError if passenger None, less than or higher than config file.
+        :raises: sqlite3.Error if database error.
+        """
+        trip_passenger_qty, trip_purpose = value.values()
+        self.trip_insert_values_validation(trip_passenger_qty=trip_passenger_qty, trip_purpose=trip_purpose)
         try:
             self.__cursor.execute('''
-                INSERT INTO Trip(tripPassengerQty) VALUES(?)
-            ''', (trip_passenger_qty,))
+                INSERT INTO Trip(tripPassengerQty, tripPurpose) VALUES(?,?)
+            ''', (trip_passenger_qty, trip_purpose))
             row = self.__cursor.lastrowid
         except sqlite3.Error as exc:
             self.close_connection()
