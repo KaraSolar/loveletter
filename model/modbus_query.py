@@ -19,7 +19,7 @@ class ModbusQuery:
         self.server_port = 502
         self.client = ModbusTcpClient(self.server_ip, port=self.server_port)
         self.client.connect()  # even if false when querying the registers the socket will be opened.
-        self.__register_values = None
+        self.__register_values = []
         self.__telemetry: dict = {"battery_voltage": None, "battery_current": None,
                                   "battery_power": None, "battery_state_of_charge": None,
                                   "pv-dc-coupled_power": None, "pv-dc-coupled_current": None,
@@ -57,11 +57,9 @@ class ModbusQuery:
         """
         try:
             response = self.client.read_holding_registers(address=address, count=count, unit=unit)
-            response = response.registers
+            return response.registers
         except (ModbusIOException, ModbusException, ConnectionException, AttributeError) as exe:
-            raise exe
-        else:
-            return response
+            return [None] * count
 
     def read_telemetry_registers(self) -> None:
         """
@@ -72,23 +70,15 @@ class ModbusQuery:
         Tuples maintain order and allow duplicates.
         :return: None
         """
-        try:
-            battery_regs = self.read_registers(address=840, count=4)  # 840 to 843
-            solar_regs = self.read_registers(address=850, count=2)  # 850 to 851
-            georef_regs = self.read_registers(address=2800, count=10)  # 2800 to 2809
-        except (ModbusIOException, ModbusException, ConnectionException, AttributeError) as exe:
-            raise exe
-        else:
-            self.__register_values = battery_regs + solar_regs + georef_regs
+        register_ranges = [
+            (840, 4),   # battery registers: 840 to 843
+            (850, 2),   # solar registers: 850 to 851
+            (2800, 10)  # georef registers: 2800 to 2809
+        ]
+        self.__register_values = []
+        for address, count in register_ranges:
+            self.__register_values.extend(self.read_registers(address, count))
             # If you change this order or add more registers you'll need to modify the telemetry dict.
-
-    def set_register_values_to_none(self) -> None:
-        """
-        This function encapsulates replacing every value in the registers value list to None.
-        :return: None
-        """
-        number_of_registers = 16
-        self.__register_values = [None] * number_of_registers
 
     def set_telemetry_from_register_values(self) -> None:
         """
@@ -96,7 +86,6 @@ class ModbusQuery:
         :return: None
         """
         self.__telemetry.update(zip(self.__telemetry, self.__register_values))
-
 
     def set_scaling(self) -> None:
         """
@@ -110,8 +99,14 @@ class ModbusQuery:
         """
         sensors_scale_10 = ["battery_voltage", "battery_current", "pv-dc-coupled_current"]
         for key in sensors_scale_10:
-            self.__telemetry[key] = self.__telemetry[key] / 10
-        self.__telemetry["speed"] = self.__telemetry["speed"] / 100
+            try:
+                self.__telemetry[key] = self.__telemetry[key] / 10
+            except TypeError:
+                pass
+        try:
+            self.__telemetry["speed"] = self.__telemetry["speed"] / 100
+        except TypeError:
+            pass
 
     def set_negative_values(self) -> None:
         """
@@ -125,7 +120,7 @@ class ModbusQuery:
         """
         sensors_support_negative_values = ["battery_current", "battery_power", "pv-dc-coupled_current"]
         for key in sensors_support_negative_values:
-            if self.__telemetry[key] >= 32768:
+            if self.__telemetry[key] is not None and self.__telemetry[key] >= 32768:
                 self.__telemetry[key] = self.__telemetry[key] - 65536
 
     def read_and_format_telemetry_registers(self) -> dict:
@@ -136,15 +131,10 @@ class ModbusQuery:
         and stores the telemetry values in the telemetry list and returns a copy of that list.
         :return: list
         """
-        try:
-            self.read_telemetry_registers()
-        except (ModbusIOException, ModbusException, ConnectionException, AttributeError):
-            self.set_register_values_to_none()
-            self.set_telemetry_from_register_values()
-        else:
-            self.set_telemetry_from_register_values()
-            self.set_scaling()
-            self.set_negative_values()
+        self.read_telemetry_registers()
+        self.set_telemetry_from_register_values()
+        self.set_scaling()
+        self.set_negative_values()
         return self.__telemetry.copy()
 
     def disconnect(self) -> int:
