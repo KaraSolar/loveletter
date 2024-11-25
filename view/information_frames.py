@@ -14,14 +14,14 @@ class InitiateTripFrame(ttk.Frame):
         self.labels_frame.columnconfigure(0, weight=1, uniform="a")
         self.labels_frame.rowconfigure((0, 1), weight=1, uniform="a")
         self.labels_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
-        self.initiate_trip_label = ttk.Label(master=self.labels_frame,
+        self.initiate_trip_label_pass_number = ttk.Label(master=self.labels_frame,
                                              textvariable=self.initiate_trip_text_var_pass_number,
                                              font=("Digital-7", 21))
-        self.initiate_trip_label.grid(row=0, column=0, sticky="s")
-        self.initiate_trip_label = ttk.Label(master=self.labels_frame,
+        self.initiate_trip_label_pass_number.grid(row=0, column=0, sticky="s")
+        self.initiate_trip_label_trip_purpose = ttk.Label(master=self.labels_frame,
                                              textvariable=self.initiate_trip_text_var_trip_purpose,
                                              font=("Digital-7", 21))
-        self.initiate_trip_label.grid(row=1, column=0)
+        self.initiate_trip_label_trip_purpose.grid(row=1, column=0)
         self.yes_no_buttons()
 
     def yes_no_buttons(self):
