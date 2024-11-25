@@ -40,9 +40,12 @@ class View():
     def start_mainloop(self):
         self.root.mainloop()
 
-    def trip_purpose_validator(self):
+    def trip_purpose_validator(self) -> bool:
+        '''Validates if the selected trip purpose is in the configured list.
+        :return: bool: True if purpose is valid, False otherwise
+        '''
         if self.passenger_input_frame.trip_purpose_var.get() in self.trip_purposes_config:
             return True
-        else:
-            self.trip_purpose_warning.set_warning_text_var()
-            self.raise_frame(frame="trip_purpose_warning")
+        self.trip_purpose_warning.set_warning_text_var()
+        self.raise_frame(frame="trip_purpose_warning")
+        return False

@@ -3,7 +3,6 @@ This module contains the class PassengerInput, part of the VIEW.
 '''
 
 import ttkbootstrap as ttk
-from ttkbootstrap.dialogs.dialogs import Messagebox
 
 class PassengerInput(ttk.Frame):
     '''
