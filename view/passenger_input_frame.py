@@ -48,7 +48,7 @@ class PassengerInput(ttk.Frame):
         self.min_passenger: int = self.passenger_number_config["min"]
         self.label_font_size: tuple = label_font_size
         self.passenger_number_var: ttk.IntVar = ttk.IntVar(value=self.min_passenger)
-        self.trip_purpose_var: ttk.StringVar = ttk.StringVar(value='Escoja un motivo de viaje.')
+        self.trip_purpose_var: ttk.StringVar = ttk.StringVar(value='Motivo de viaje')
 
         # ____________FrameConfiguration_____________
         self.columnconfigure((0,1,2), weight= 1, uniform="a")
