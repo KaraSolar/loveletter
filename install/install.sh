@@ -21,6 +21,7 @@ log_stated_install(){
 		echo "                                        USE AT YOUR OWN RISK                      "
 	fi
 	echo "                                             ${INSTALL_VER}                           "
+	echo ""
 }
 
 repo_install(){
@@ -30,6 +31,27 @@ repo_install(){
 		rm -rf "$dest_dir"
 	fi
 	git clone --branch $INSTALL_VER --single-branch $repo --progress 2>&1 | sed '/You are in '\''detached HEAD'\''/,$d'
+	cd loveletter
+	sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo apt full-upgrade -y
+	apt list --upgradable
+	sudo apt -o APT::Get::Always-Include-Phased-Updates=true full-upgrade -y
+	sudo apt install python3 -y
+	sudo apt install python3-pip -y
+	sudo apt install python3-tk -y
+	sudo apt install python3.12-venv -y
+	#sudo apt install python3-xyz -y
+	python3 --version
+	sudo apt update && sudo apt upgrade -y
+	python3 -m venv env
+	source env/bin/activate
+
+	pip3 install Pillow
+	pip3 install pyModbusTCP
+	pip3 install pyserial
+	pip3 install PyYAML
+	pip3 install six
+	pip3 install ttkbootstrap
+	pip3 install pymodbus==2.5.3
 	#rm -rf "install.sh"
 }
 
