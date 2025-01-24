@@ -6,23 +6,21 @@ tags=($(git ls-remote --tags $repo | awk -F'/' '{print $NF}'))
 
 log_stated_install(){
 	DISPLAY_VER=$(echo $INSTALL_VER | sed "s|~alpha||g" | sed "s|~beta||g")
-	echo '_________________________________________________________________________________________'
-	echo ''
 	echo '___  ___  ___  ______  ___  ____  ____ __     ___ ___  ___ ___ ____  ___  __  __ ___  __ '
 	echo '||\\//|| // \\ | || | // \\ || \\||   (( \   // \\||\\//||// \\  // // \\ ||\ ||// \\(( \'
 	echo '|| \/ ||((   ))  ||  ((   ))||_//||==  \\    ||=|||| \/ ||||=|| // ((   ))||\\||||=|| \\ '
 	echo '||    || \\_//   ||   \\_// || \\||___\_))   || ||||    |||| ||//__ \\_// || \|||| ||\_))'
 	echo "                                                                        "
-	echo "                                                  LOVELETTER INSTALLER                       "
+	echo "                                        LOVELETTER INSTALLER                       "
 	if [[ "$INSTALL_VER" =~ "beta" ]]; then
-	    echo "                                                      BETA RELEASE                       "
+	    echo "                                            BETA RELEASE                       "
 	fi
 	if [[ "$INSTALL_VER" =~ "alpha" ]]; then
-		echo "                                                  DEVELOPMENT SNAPSHOT                      "
-		echo "                                             OT INTENDED FOR PRODUCTION USE                 "
-		echo "                                                  USE AT YOUR OWN RISK                      "
+		echo "                                        DEVELOPMENT SNAPSHOT                      "
+		echo "                                   OT INTENDED FOR PRODUCTION USE                 "
+		echo "                                        USE AT YOUR OWN RISK                      "
 	fi
-	echo "                                                       ${INSTALL_VER}                           "
+	echo "                                             ${INSTALL_VER}                           "
 }
 
 repo_install(){
