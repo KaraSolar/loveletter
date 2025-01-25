@@ -84,11 +84,12 @@ class WorkerDatabase(threading.Thread):
         queue_worker_database (queue.Queue, required): a queue object used to send telemetry data across threads.
     """
     def __init__(self, queue_worker_database: queue.Queue,
-                 db_name: str, passenger_number_config: dict):
+                 db_name: str, passenger_number_config: dict, trip_purposes_config: list):
         super().__init__(daemon=False)
         self.queue_worker_database = queue_worker_database
         self.db_name = db_name
         self.passenger_number_config = passenger_number_config
+        self.trip_purposes_config = trip_purposes_config
 
     def run(self):
         """Start the queue listening.
@@ -99,14 +100,15 @@ class WorkerDatabase(threading.Thread):
         :return: 0 when terminated.
         """
         telemetry_database = TelemetryDatabase(self.db_name,
-                                               passenger_number_config=self.passenger_number_config)  # Initialize within the new thread otherwise race conditions.
+                                               passenger_number_config=self.passenger_number_config,
+                                               trip_purposes_config=self.trip_purposes_config)  # Initialize within the new thread otherwise race conditions.
         while True:
             message = self.queue_worker_database.get()
             message_type = message["type"]
             if message_type == "telemetry":
                 telemetry_database.insert_telemetry(message["value"])
             elif message_type == "trip":
-                telemetry_database.insert_trip(message["value"])
+                telemetry_database.insert_trip(value=message["value"])
             elif message_type == "end_trip":
                 telemetry_database.end_of_trip()
             elif message_type == "destroy":
