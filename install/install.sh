@@ -47,10 +47,34 @@ clean_dir() {
     fi
 }
 
+clone_repo() {
+    local tag="$1"
+    local repo_crons="$2"
+
+    echo "------------------------------------------------------------"
+
+    git clone --branch "$tag" --single-branch "$repo_crons" --progress 2>&1 | \
+        sed '/You are in '\''detached HEAD'\''/,$d' | \
+        while IFS= read -r line; do
+            echo -e "\e[32m✔ $line\e[0m"  # Green for progress logs
+        done
+
+    # Check if the clone was successful
+    if [[ ${PIPESTATUS[0]} -eq 0 ]]; then
+        echo "------------------------------------------------------------"
+    else
+        echo "------------------------------------------------------------"
+        echo -e "\e[31m❌ Clone failed for repository: $repo_crons\e[0m"
+        return 1
+    fi
+}
+
+
 loveletter_service(){
-	echo -e "\nInstalling Cron Jobs Services ...\n"
+	echo -e "\nInstalling Cron Jobs Services ..."
 	clean_dir "$repo_crons"
-	git clone --branch $tag --single-branch $repo_crons --progress 2>&1 | sed '/You are in '\''detached HEAD'\''/,$d'
+	clone_repo $tag $repo_crons
+	#git clone --branch $tag --single-branch $repo_crons --progress 2>&1 | sed '/You are in '\''detached HEAD'\''/,$d'
 	sudo cp $(pwd)/Rpi_Crons/loveletter.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.timer /etc/systemd/system/
@@ -83,7 +107,16 @@ install_requirements() {
 
     if [[ -f "$requirements_file" ]]; then
         echo "Installing requirements from $requirements_file..."
-        pip3 install -r "$requirements_file"
+
+        while read -r package; do
+            if pip install "$package" &>/tmp/pip_install_log; then
+                echo "✅ Successfully installed: $package"
+            else
+                echo "❌ Failed to install: $package"
+                echo "Error log:"
+                cat /tmp/pip_install_log
+            fi
+        done < "$requirements_file"
     else
         echo "Error: $requirements_file not found."
         return 1
@@ -92,10 +125,13 @@ install_requirements() {
 
 repo_install(){
 	clean_dir "$repo"
-	git clone --branch $INSTALL_VER --single-branch $repo --progress 2>&1 | sed '/You are in '\''detached HEAD'\''/,$d'
+	clone_repo $INSTALL_VER $repo
+	#git clone --branch $INSTALL_VER --single-branch $repo --progress 2>&1 | sed '/You are in '\''detached HEAD'\''/,$d'
 	cd loveletter
+	chmod +x $(pwd)/start.sh
 	
-	python3 --version
+	echo -e "\n__________ Python version Avalaible: $(python3 --version)  ________"
+	
 	python3 -m venv env
 	source env/bin/activate
 
@@ -152,6 +188,7 @@ else
 	fi
 fi
 
+echo -e "\e[34m\nInstall completed successfully (Branch/Tag: $INSTALL_VER)\e[0m"
 tput civis
 read -p "" input
 tput cnorm
