@@ -78,8 +78,8 @@ loveletter_service(){
 	sudo cp $(pwd)/Rpi_Crons/loveletter.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.timer /etc/systemd/system/
-	add_or_replace_variable "WorkingDirectory" "$(pwd)/loveletter" "/etc/systemd/system/loveletter.service"
-	add_or_replace_variable "ExecStart" "$(pwd)/loveletter/start.sh" "/etc/systemd/system/loveletter.service"
+	add_or_replace_variable "WorkingDirectory" "$(pwd)" "/etc/systemd/system/loveletter.service"
+	add_or_replace_variable "ExecStart" "$(pwd)/start.sh" "/etc/systemd/system/loveletter.service"
 
 	sudo systemctl daemon-reload
 	sudo systemctl enable loveletter.service
@@ -188,6 +188,7 @@ else
 	fi
 fi
 
+bash start.sh
 echo -e "\e[34m\nInstall completed successfully (Branch/Tag: $INSTALL_VER)\e[0m"
 tput civis
 read -p "" input
