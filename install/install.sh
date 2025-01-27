@@ -33,7 +33,7 @@ add_or_replace_variable() {
 
     if grep -q "^$variable=" "$file"; then
         # Replace the existing variable line
-        sed -i "s|^$variable=.*|$variable=$value|" "$file"
+        sudo sed -i "s|^$variable=.*|$variable=$value|" "$file"
     else
         # Append the variable to the end of the file
         echo "$variable=$value" >> "$file"
