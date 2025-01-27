@@ -1,5 +1,5 @@
 clear
-#repo=https://github.com/PPUC/ZeDMD.git
+
 repo=https://github.com/KaraSolar/loveletter.git
 repo_crons=https://github.com/KaraSolar/Rpi_Crons.git
 
@@ -27,32 +27,35 @@ log_stated_install(){
 }
 
 add_or_replace_variable() {
-    local variable="$1"  # The variable name
-    local value="$2"     # The value to set
-    local file="$3"      # The target file
+    local variable="$1"
+    local value="$2"
+    local file="$3"
 
     if grep -q "^$variable=" "$file"; then
-        # Replace the existing variable line
         sudo sed -i "s|^$variable=.*|$variable=$value|" "$file"
     else
-        # Append the variable to the end of the file
         echo "$variable=$value" >> "$file"
     fi
 }
 
+clean_dir() {
+    local repo_url="$1"
+    local dest_dir=$(basename -s .git "$repo_url")
+    if [[ -d $dest_dir ]]; then
+        echo "Directory '$dest_dir' already exists. Deleting it..."
+        rm -rf "$dest_dir"
+    fi
+}
+
 loveletter_service(){
-	echo -e "Installing Cron Jobs Services ...\n"
-	dest_dir=$(basename -s .git "$repo_crons")
-	if [[ -d $dest_dir ]]; then
-		echo "Directory '$dest_dir' already exists. Deleting it..."
-		rm -rf "$dest_dir"
-	fi
+	echo -e "\nInstalling Cron Jobs Services ...\n"
+	clean_dir "$repo_crons"
 	git clone --branch $tag --single-branch $repo_crons --progress 2>&1 | sed '/You are in '\''detached HEAD'\''/,$d'
-	sudo cp ~/Rpi_Crons/loveletter.service /etc/systemd/system/
-	auxdir=$(pwd)/loveletter
-	add_or_replace_variable "WorkingDirectory" "${auxdir}" "/etc/systemd/system/loveletter.service"
-	auxdir=$(pwd)/loveletter/start.sh
-	add_or_replace_variable "ExecStart" "${auxdir}" "/etc/systemd/system/loveletter.service"
+	sudo cp $(pwd)/Rpi_Crons/loveletter.service /etc/systemd/system/
+	sudo cp $(pwd)/Rpi_Crons/daily_restart.service /etc/systemd/system/
+	sudo cp $(pwd)/Rpi_Crons/daily_restart.timer /etc/systemd/system/
+	add_or_replace_variable "WorkingDirectory" "$(pwd)/loveletter" "/etc/systemd/system/loveletter.service"
+	add_or_replace_variable "ExecStart" "$(pwd)/loveletter/start.sh" "/etc/systemd/system/loveletter.service"
 
 	sudo systemctl daemon-reload
 	sudo systemctl enable loveletter.service
@@ -60,34 +63,51 @@ loveletter_service(){
 
 }
 
-repo_install(){
-	dest_dir=$(basename -s .git "$repo")
-	if [[ -d $dest_dir ]]; then
-		echo "Directory '$dest_dir' already exists. Deleting it..."
-		rm -rf "$dest_dir"
-	fi
-	git clone --branch $INSTALL_VER --single-branch $repo --progress 2>&1 | sed '/You are in '\''detached HEAD'\''/,$d'
-	cd loveletter
-	sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo apt full-upgrade -y
-	apt list --upgradable
-	sudo apt -o APT::Get::Always-Include-Phased-Updates=true full-upgrade -y
+python_upgrade(){
 	sudo apt install python3 -y
 	sudo apt install python3-pip -y
 	sudo apt install python3-tk -y
 	sudo apt install python3.12-venv -y
 	#sudo apt install python3-xyz -y
-	python3 --version
+}
+
+packages_update(){
+	sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo apt full-upgrade -y
+	apt list --upgradable
+	sudo apt -o APT::Get::Always-Include-Phased-Updates=true full-upgrade -y
 	sudo apt update && sudo apt upgrade -y
+}
+
+install_requirements() {
+    local requirements_file="$1"
+
+    if [[ -f "$requirements_file" ]]; then
+        echo "Installing requirements from $requirements_file..."
+        pip3 install -r "$requirements_file"
+    else
+        echo "Error: $requirements_file not found."
+        return 1
+    fi
+}
+
+repo_install(){
+	clean_dir "$repo"
+	git clone --branch $INSTALL_VER --single-branch $repo --progress 2>&1 | sed '/You are in '\''detached HEAD'\''/,$d'
+	cd loveletter
+	
+	python3 --version
 	python3 -m venv env
 	source env/bin/activate
 
-	pip3 install Pillow
+	: 'pip3 install Pillow
 	pip3 install pyModbusTCP
 	pip3 install pyserial
 	pip3 install PyYAML
 	pip3 install six
 	pip3 install ttkbootstrap
-	pip3 install pymodbus==2.5.3
+	pip3 install pymodbus==2.5.3'
+
+	install_requirements "requirements.txt"
 
 	#rm -rf "install.sh"
 }
@@ -95,8 +115,8 @@ repo_install(){
 clines(){
 	local lines_to_clear=$1
     for ((j=0; j<lines_to_clear; j++)); do
-        tput cuu1  # Mueve el cursor una línea hacia arriba
-        tput el    # Limpia la línea actual
+        tput cuu1
+        tput el
     done
 }
 
@@ -122,17 +142,13 @@ else
 		response=i
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
+		repo_install
 		loveletter_service
-		#repo_install
-
-		#echo "You selected: ${tags[((response-1))]}"
 	else
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
+		repo_install
 		loveletter_service
-		#repo_install
-		
-		#echo "You selected: ${tags[((response-1))]}"
 	fi
 fi
 
