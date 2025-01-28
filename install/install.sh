@@ -74,7 +74,6 @@ loveletter_service(){
 	echo -e "\nInstalling Cron Jobs Services ..."
 	clean_dir "$repo_crons"
 	clone_repo $tag $repo_crons
-	#git clone --branch $tag --single-branch $repo_crons --progress 2>&1 | sed '/You are in '\''detached HEAD'\''/,$d'
 	sudo cp $(pwd)/Rpi_Crons/loveletter.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.timer /etc/systemd/system/
@@ -85,6 +84,7 @@ loveletter_service(){
 	sudo systemctl enable loveletter.service
 	sudo systemctl start loveletter.service
 
+	clean_dir "$repo_crons"
 }
 
 python_upgrade(){
@@ -126,7 +126,6 @@ install_requirements() {
 repo_install(){
 	clean_dir "$repo"
 	clone_repo $INSTALL_VER $repo
-	#git clone --branch $INSTALL_VER --single-branch $repo --progress 2>&1 | sed '/You are in '\''detached HEAD'\''/,$d'
 	cd loveletter
 	chmod +x $(pwd)/start.sh
 	
@@ -135,16 +134,7 @@ repo_install(){
 	python3 -m venv env
 	source env/bin/activate
 
-	: 'pip3 install Pillow
-	pip3 install pyModbusTCP
-	pip3 install pyserial
-	pip3 install PyYAML
-	pip3 install six
-	pip3 install ttkbootstrap
-	pip3 install pymodbus==2.5.3'
-
 	install_requirements "requirements.txt"
-
 	#rm -rf "install.sh"
 }
 
@@ -193,10 +183,3 @@ echo -e "\e[34m\nInstall completed successfully (Branch/Tag: $INSTALL_VER)\e[0m"
 tput civis
 read -p "" input
 tput cnorm
-
-
-
-: '
-coment 
-multi
-lines'
