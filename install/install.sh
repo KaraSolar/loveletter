@@ -135,7 +135,7 @@ repo_install(){
 	source env/bin/activate
 
 	install_requirements "requirements.txt"
-	#rm -rf "install.sh"
+	rm -rf "install.sh"
 }
 
 clines(){
@@ -178,7 +178,6 @@ else
 	fi
 fi
 
-bash start.sh
 echo -e "\e[34m\nInstall completed successfully (Branch/Tag: $INSTALL_VER)\e[0m"
 tput civis
 read -p "" input
