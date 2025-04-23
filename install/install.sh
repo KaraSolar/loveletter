@@ -85,6 +85,8 @@ loveletter_service(){
 	sudo systemctl start loveletter.service
 
 	clean_dir "$repo_crons"
+	cd ..
+	#rm -rf "install.sh"
 }
 
 python_upgrade(){
@@ -135,7 +137,6 @@ repo_install(){
 	source env/bin/activate
 
 	install_requirements "requirements.txt"
-	rm -rf "install.sh"
 }
 
 clines(){
@@ -144,6 +145,27 @@ clines(){
         tput cuu1
         tput el
     done
+}
+
+pendrive_check(){
+	if [ -d "$(pwd)/loveletter" ]; then
+		mountpoint=$(df "$(pwd)/loveletter" | tail -1 | awk '{print $1}')
+		if grep -q "$mountpoint" /proc/mounts && grep -q "/media/" <<< "$(pwd)"; then
+			echo "Se detectó una instalacion en un dispositivo externo."
+			echo "Mountpoint: $mountpoint"
+			echo "Configurando RPI y service files..."
+			#echo "PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 defaults,noatime 0 0" | sudo tee -a /etc/fstab
+			if grep -q '/media/pi/pollen' /etc/fstab; then
+				sudo sed -i "\|/media/pi/pollen|c\PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 defaults,noatime 0 0" /etc/fstab
+			else
+				echo "PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 defaults,noatime 0 0" | sudo tee -a /etc/fstab
+			fi
+		else
+			echo ""
+		fi
+	else
+		echo "Se detectó un problema en la instalación"
+	fi
 }
 
 echo "Repo Installing: $repo"
@@ -170,11 +192,13 @@ else
 		log_stated_install
 		repo_install
 		loveletter_service
+		pendrive_check
 	else
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
 		repo_install
 		loveletter_service
+		pendrive_check
 	fi
 fi
 
