@@ -7,7 +7,7 @@ database:
   trip_purposes: ['Escuela', 'Salud', 'Minga', 'Otros']
 
 cerbo_gx:
-  server_ip: '169.254.10.170'
+  server_ip: '169.254.1.2'
 
 passenger_number:
   min: 0
