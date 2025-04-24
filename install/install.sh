@@ -156,16 +156,30 @@ pendrive_check(){
 			echo "Configurando RPI y service files..."
 			#echo "PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 defaults,noatime 0 0" | sudo tee -a /etc/fstab
 			if grep -q '/media/pi/pollen' /etc/fstab; then
-				sudo sed -i "\|/media/pi/pollen|c\PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 defaults,noatime 0 0" /etc/fstab
+				#sudo sed -i "\|/media/pi/pollen|c\PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 defaults,noatime 0 0" /etc/fstab
+				#sudo sed -i "\|/media/pi/pollen|c\PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 defaults,noatime,nofail,x-systemd.automount 0 0" /etc/fstab
+				sudo sed -i "\|/media/pi/pollen|c\PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 nofail,x-systemd.device-timeout=1 0 2" /etc/fstab
 			else
-				echo "PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 defaults,noatime 0 0" | sudo tee -a /etc/fstab
+				#echo "PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 defaults,noatime 0 0" | sudo tee -a /etc/fstab
+				#echo "PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 defaults,noatime,nofail,x-systemd.automount 0 0" | sudo tee -a /etc/fstab
+				echo "PARTUUID=$(sudo blkid | grep 'LABEL=\"pollen\"' | sed -n 's/.*PARTUUID=\"\([^\"]*\)\".*/\1/p') /media/pi/pollen ext3 nofail,x-systemd.device-timeout=1 0 2" | sudo tee -a /etc/fstab
 			fi
+			add_or_replace_variable "WantedBy" "media-pi-pollen.mount" "/etc/systemd/system/loveletter.service"
+			#ConditionPathExists=/media/pi/pollen/loveletter/start.sh
+			sudo systemctl daemon-reexec
+			sudo systemctl daemon-reload
+			echo 'ACTION=="add", SUBSYSTEM=="block", KERNEL=="sda1", RUN+="/usr/bin/systemctl restart loveletter.service"' | sudo tee /etc/udev/rules.d/99-usb-restart-loveletter.rules > /dev/null
+			sudo udevadm control --reload-rules
 		else
 			echo ""
 		fi
 	else
 		echo "Se detectó un problema en la instalación"
 	fi
+}
+
+eth0_config(){
+	sudo nmcli con mod "Wired connection 1"   ipv4.method manual   ipv4.addresses 169.254.1.3/24   ipv4.gateway 169.254.1.1
 }
 
 echo "Repo Installing: $repo"
@@ -193,12 +207,14 @@ else
 		repo_install
 		loveletter_service
 		pendrive_check
+		eth0_config
 	else
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
 		repo_install
 		loveletter_service
 		pendrive_check
+		eth0_config
 	fi
 fi
 
