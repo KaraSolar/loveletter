@@ -166,9 +166,12 @@ pendrive_check(){
 			fi
 			add_or_replace_variable "WantedBy" "media-pi-pollen.mount" "/etc/systemd/system/loveletter.service"
 			#ConditionPathExists=/media/pi/pollen/loveletter/start.sh
+			grep -q 'ConditionPathExists' /etc/systemd/system/loveletter.service && sudo sed -i "s|^ConditionPathExists.*|ConditionPathExists=$(pwd)/loveletter/start.sh|" /etc/systemd/system/loveletter.service || sudo sed -i "/^After=graphical.target$/a ConditionPathExists=$(pwd)/loveletter/start.sh" /etc/systemd/system/loveletter.service
 			sudo systemctl daemon-reexec
 			sudo systemctl daemon-reload
-			echo 'ACTION=="add", SUBSYSTEM=="block", KERNEL=="sda1", RUN+="/usr/bin/systemctl restart loveletter.service"' | sudo tee /etc/udev/rules.d/99-usb-restart-loveletter.rules > /dev/null
+			sudo systemctl enable loveletter.service
+			sudo systemctl start loveletter.service
+			echo 'ACTION=="add", SUBSYSTEM=="block", KERNEL=="sd[a-z][0-9]", RUN+="/usr/bin/systemctl restart loveletter.service"' | sudo tee /etc/udev/rules.d/99-usb-restart-loveletter.rules > /dev/null
 			sudo udevadm control --reload-rules
 		else
 			echo ""
