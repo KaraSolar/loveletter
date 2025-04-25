@@ -179,10 +179,15 @@ pendrive_check(){
 	else
 		echo "Se detectó un problema en la instalación"
 	fi
+	# Previa solucion para ocultar las notificaicones de Unidad externa montada"
+	#dconf write /org/gnome/desktop/media-handling/automount false
+	#dconf write /org/gnome/desktop/media-handling/automount-open false
 }
 
 eth0_config(){
 	sudo nmcli con mod "Wired connection 1"   ipv4.method manual   ipv4.addresses 169.254.1.3/24   ipv4.gateway 169.254.1.1
+	sudo nmcli con mod "Wired connection 1" ipv4.route-metric 800
+	sudo nmcli connection down "Wired connection 1" && sudo nmcli connection up "Wired connection 1"
 }
 
 echo "Repo Installing: $repo"
