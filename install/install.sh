@@ -2,9 +2,11 @@ clear
 
 repo=https://github.com/KaraSolar/loveletter.git
 repo_crons=https://github.com/KaraSolar/Rpi_Crons.git
+repo_extraction=https://github.com/KaraSolar/LoveLetterExtraction
 
 tags=($(git ls-remote --tags $repo | awk -F'/' '{print $NF}'))
 tag=$(git ls-remote --tags --sort="v:refname" $repo_crons | tail -n1 | awk -F'/' '{print $NF}')
+extract_tag=$(git ls-remote --tags --sort="v:refname" $repo_extraction | head -n1 | awk -F'/' '{print $NF}')
 
 log_stated_install(){
 	DISPLAY_VER=$(echo $INSTALL_VER | sed "s|~alpha||g" | sed "s|~beta||g")
@@ -77,14 +79,20 @@ loveletter_service(){
 	sudo cp $(pwd)/Rpi_Crons/loveletter.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.timer /etc/systemd/system/
-	add_or_replace_variable "WorkingDirectory" "$(pwd)" "/etc/systemd/system/loveletter.service"
-	add_or_replace_variable "ExecStart" "$(pwd)/start.sh" "/etc/systemd/system/loveletter.service"
+	sudo cp $(pwd)/Rpi_Crons/loveletter_extraction.service /etc/systemd/system/
+	sudo cp $(pwd)/Rpi_Crons/loveletter_extraction.timer /etc/systemd/system/
+	add_or_replace_variable "WorkingDirectory" "$(pwd)/loveletter" "/etc/systemd/system/loveletter.service"
+	add_or_replace_variable "ExecStart" "$(pwd)/loveletter/start.sh" "/etc/systemd/system/loveletter.service"
+	add_or_replace_variable "WorkingDirectory" "$(pwd)/LoveLetterExtraction" "/etc/systemd/system/loveletter_extraction.service"
+	add_or_replace_variable "ExecStart" "$(pwd)/LoveLetterExtraction/run.sh" "/etc/systemd/system/loveletter_extraction.service"
 
 	sudo systemctl daemon-reload
 	sudo systemctl enable loveletter.service
 	sudo systemctl start loveletter.service
  	sudo systemctl enable daily_restart.timer
   	sudo systemctl start daily_restart.timer
+	sudo systemctl enable loveletter_extraction.timer
+	sudo systemctl start loveletter_extraction.timer
 
 	clean_dir "$repo_crons"
 	cd ..
@@ -123,7 +131,24 @@ install_requirements() {
             return 1
         fi
 
-        while read -r package; do
+        # Check if requirements file has content
+        if [[ ! -s "$requirements_file" ]]; then
+            echo "⚠️ Requirements file is empty. No packages to install."
+            return 0
+        fi
+
+        echo "Contents of requirements file:"
+        cat "$requirements_file"
+        echo "-----------------------------"
+
+        # Process requirements file
+        while IFS= read -r package || [[ -n "$package" ]]; do
+            # Skip empty lines and comments
+            [[ -z "$package" || "$package" =~ ^[[:space:]]*# ]] && continue
+            
+            package=$(echo "$package" | tr -d '\r')  # Remove CR if present
+            
+            echo "Installing package: '$package'"
             if pip install "$package" &>/tmp/pip_install_log; then
                 echo "✅ Successfully installed: $package"
             else
@@ -132,6 +157,9 @@ install_requirements() {
                 cat /tmp/pip_install_log
             fi
         done < "$requirements_file"
+
+        echo 'deactivate venv'
+        deactivate
     else
         echo "Error: $requirements_file not found."
         return 1
@@ -150,6 +178,7 @@ repo_install(){
 	source env/bin/activate
 
 	install_requirements "requirements.txt"
+	cd ..
 }
 
 clines(){
@@ -203,6 +232,20 @@ eth0_config(){
 	sudo nmcli connection down "Wired connection 1" && sudo nmcli connection up "Wired connection 1"
 }
 
+loveletter_extraction(){
+	sudo hostnamectl set-hostname "$Boat"
+	clone_repo $extract_tag $repo_extraction
+	cd LoveLetterExtraction
+	sudo apt install sqlite3 -y
+	sqlite3 extraction_log.db < dates.sql
+	mkdir keys
+	python3 -m venv env
+	source env/bin/activate
+	install_requirements "requirements.txt"
+	chmod +x $(pwd)/run.sh
+	cd ..
+}
+
 echo "Repo Installing: $repo"
 echo -e "________________________Avalaible Tags_________________________\n"
 for i in "${!tags[@]}"; do
@@ -218,6 +261,7 @@ else
     read -p "->  Select betwen (1-$i): " response
 
 	clines 4
+	read -p 'Por favor, ingrese el nombre del Barco: ' Boat
 
 	if [[ "$response" -gt "$i" ]]; then
     	echo -e "    Tag selected: ($response) no exist"
@@ -226,6 +270,7 @@ else
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
 		repo_install
+		loveletter_extraction
 		loveletter_service
 		pendrive_check
 		eth0_config
@@ -233,6 +278,7 @@ else
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
 		repo_install
+		loveletter_extraction
 		loveletter_service
 		pendrive_check
 		eth0_config
