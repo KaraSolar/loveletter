@@ -3,7 +3,6 @@ clear
 repo=https://github.com/KaraSolar/loveletter.git
 repo_crons=https://github.com/KaraSolar/Rpi_Crons.git
 repo_extraction=https://github.com/KaraSolar/LoveLetterExtraction
-# prompt para cambiar el nombre del hostname
 
 tags=($(git ls-remote --tags $repo | awk -F'/' '{print $NF}'))
 tag=$(git ls-remote --tags --sort="v:refname" $repo_crons | tail -n1 | awk -F'/' '{print $NF}')
@@ -213,6 +212,7 @@ eth0_config(){
 }
 
 loveletter_extraction(){
+	sudo hostnamectl set-hostname $Boat
 	clone_repo $extract_tag $repo_extraction
 	cd LoveLetterExtraction
 	sudo apt install sqlite3 -y
@@ -240,6 +240,7 @@ else
     read -p "->  Select betwen (1-$i): " response
 
 	clines 4
+	read -p 'Por favor, ingrese el nombre del Barco: ' Boat
 
 	if [[ "$response" -gt "$i" ]]; then
     	echo -e "    Tag selected: ($response) no exist"
@@ -251,6 +252,7 @@ else
 		loveletter_service
 		pendrive_check
 		eth0_config
+		loveletter_extraction
 	else
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
@@ -258,6 +260,7 @@ else
 		loveletter_service
 		pendrive_check
 		eth0_config
+		loveletter_extraction
 	fi
 fi
 
