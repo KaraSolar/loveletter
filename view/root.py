@@ -5,7 +5,7 @@ class Root(ttk.Window):
         super().__init__(themename="cyborg",
                          title="Love Letter")
         self.geometry("800x600+0+0")
-        self.attributes("-fullscreen", True)
+        self.after(4000, lambda: self.attributes("-fullscreen", True))
         self.resizable(False,False)
         self.update_idletasks()
         # Title fonts
