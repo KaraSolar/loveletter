@@ -83,6 +83,8 @@ loveletter_service(){
 	sudo systemctl daemon-reload
 	sudo systemctl enable loveletter.service
 	sudo systemctl start loveletter.service
+ 	sudo systemctl enable daily_restart.timer
+  	sudo systemctl start daily_restart.timer
 
 	clean_dir "$repo_crons"
 	cd ..
