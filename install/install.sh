@@ -81,10 +81,10 @@ loveletter_service(){
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.timer /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/loveletter_extraction.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/loveletter_extraction.timer /etc/systemd/system/
-	add_or_replace_variable "WorkingDirectory" "$(pwd)" "/etc/systemd/system/loveletter.service"
-	add_or_replace_variable "ExecStart" "$(pwd)/start.sh" "/etc/systemd/system/loveletter.service"
-	add_or_replace_variable "WorkingDirectory" "$(pwd)" "/etc/systemd/system/loveletter_extraction.service"
-	add_or_replace_variable "ExecStart" "$(pwd)/start.sh" "/etc/systemd/system/loveletter_extraction.service"
+	add_or_replace_variable "WorkingDirectory" "$(pwd)/loveletter" "/etc/systemd/system/loveletter.service"
+	add_or_replace_variable "ExecStart" "$(pwd)/loveletter/start.sh" "/etc/systemd/system/loveletter.service"
+	add_or_replace_variable "WorkingDirectory" "$(pwd)/LoveLetterExtraction" "/etc/systemd/system/loveletter_extraction.service"
+	add_or_replace_variable "ExecStart" "$(pwd)/LoveLetterExtraction/run.sh" "/etc/systemd/system/loveletter_extraction.service"
 
 	sudo systemctl daemon-reload
 	sudo systemctl enable loveletter.service
@@ -140,6 +140,9 @@ install_requirements() {
                 cat /tmp/pip_install_log
             fi
         done < "$requirements_file"
+
+		echo 'deactivate venv'
+		deactivate
     else
         echo "Error: $requirements_file not found."
         return 1
@@ -212,7 +215,8 @@ eth0_config(){
 }
 
 loveletter_extraction(){
-	sudo hostnamectl set-hostname $Boat
+	cd ..
+	sudo hostnamectl set-hostname "$Boat"
 	clone_repo $extract_tag $repo_extraction
 	cd LoveLetterExtraction
 	sudo apt install sqlite3 -y
