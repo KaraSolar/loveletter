@@ -74,6 +74,7 @@ clone_repo() {
 
 loveletter_service(){
 	echo -e "\nInstalling Cron Jobs Services ..."
+	echo pwd
 	clean_dir "$repo_crons"
 	clone_repo $tag $repo_crons
 	sudo cp $(pwd)/Rpi_Crons/loveletter.service /etc/systemd/system/
@@ -161,6 +162,7 @@ repo_install(){
 	source env/bin/activate
 
 	install_requirements "requirements.txt"
+	cd ..
 }
 
 clines(){
