@@ -215,9 +215,6 @@ eth0_config(){
 }
 
 loveletter_extraction(){
-	echo 'Starting the extraction service'
-	pwd
-	cd ..
 	sudo hostnamectl set-hostname "$Boat"
 	clone_repo $extract_tag $repo_extraction
 	cd LoveLetterExtraction
