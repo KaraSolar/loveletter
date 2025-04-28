@@ -2,9 +2,12 @@ clear
 
 repo=https://github.com/KaraSolar/loveletter.git
 repo_crons=https://github.com/KaraSolar/Rpi_Crons.git
+repo_extraction=https://github.com/KaraSolar/LoveLetterExtraction
+# prompt para cambiar el nombre del hostname
 
 tags=($(git ls-remote --tags $repo | awk -F'/' '{print $NF}'))
 tag=$(git ls-remote --tags --sort="v:refname" $repo_crons | tail -n1 | awk -F'/' '{print $NF}')
+extract_tag=$(git ls-remote --tags --sort="v:refname" $repo_extraction | tail -n1 | awk -F'/' '{print $NF}')
 
 log_stated_install(){
 	DISPLAY_VER=$(echo $INSTALL_VER | sed "s|~alpha||g" | sed "s|~beta||g")
@@ -77,8 +80,12 @@ loveletter_service(){
 	sudo cp $(pwd)/Rpi_Crons/loveletter.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.timer /etc/systemd/system/
+	sudo cp $(pwd)/Rpi_Crons/loveletter_extraction.service /etc/systemd/system/
+	sudo cp $(pwd)/Rpi_Crons/loveletter_extraction.timer /etc/systemd/system/
 	add_or_replace_variable "WorkingDirectory" "$(pwd)" "/etc/systemd/system/loveletter.service"
 	add_or_replace_variable "ExecStart" "$(pwd)/start.sh" "/etc/systemd/system/loveletter.service"
+	add_or_replace_variable "WorkingDirectory" "$(pwd)" "/etc/systemd/system/loveletter_extraction.service"
+	add_or_replace_variable "ExecStart" "$(pwd)/start.sh" "/etc/systemd/system/loveletter_extraction.service"
 
 	sudo systemctl daemon-reload
 	sudo systemctl enable loveletter.service
@@ -201,6 +208,19 @@ eth0_config(){
 	sudo nmcli con mod "Wired connection 1"   ipv4.method manual   ipv4.addresses 169.254.1.3/24   ipv4.gateway 169.254.1.1
 	sudo nmcli con mod "Wired connection 1" ipv4.route-metric 800
 	sudo nmcli connection down "Wired connection 1" && sudo nmcli connection up "Wired connection 1"
+}
+
+loveletter_extraction(){
+	clone_repo $extract_tag $repo_extraction
+	cd LoveLetterExtraction
+	sudo apt install sqlite3 -y
+	sqlite3 extraction_log.db < dates.sql
+	mkdir keys
+	python3 -m venv env
+	source env/bin/activate
+	install_requirements "requirements.txt"
+	chmod +x $(pwd)/run.sh
+	cd ..
 }
 
 echo "Repo Installing: $repo"
