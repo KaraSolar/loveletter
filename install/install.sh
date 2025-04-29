@@ -95,7 +95,6 @@ loveletter_service(){
 	sudo systemctl start loveletter_extraction.timer
 
 	clean_dir "$repo_crons"
-	cd ..
 	#rm -rf "install.sh"
 }
 
@@ -140,7 +139,7 @@ install_requirements() {
                 cat /tmp/pip_install_log
             fi
         done < "$requirements_file"
-		deactivate
+		#deactivate
     else
         echo "Error: $requirements_file not found."
         return 1
@@ -252,17 +251,17 @@ else
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
 		repo_install
-		loveletter_extraction
 		loveletter_service
 		pendrive_check
+		loveletter_extraction
 		eth0_config
 	else
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
 		repo_install
-		loveletter_extraction
 		loveletter_service
 		pendrive_check
+		loveletter_extraction
 		eth0_config
 	fi
 fi
