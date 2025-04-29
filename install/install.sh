@@ -215,6 +215,7 @@ eth0_config(){
 
 loveletter_extraction(){
 	#sudo hostnamectl set-hostname "$Boat"
+ 	clean_dir "$repo_extraction"
 	clone_repo $extract_tag $repo_extraction
 	cd LoveLetterExtraction
 	sudo apt install sqlite3 -y
