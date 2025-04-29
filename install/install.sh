@@ -131,24 +131,7 @@ install_requirements() {
             return 1
         fi
 
-        # Check if requirements file has content
-        if [[ ! -s "$requirements_file" ]]; then
-            echo "⚠️ Requirements file is empty. No packages to install."
-            return 0
-        fi
-
-        echo "Contents of requirements file:"
-        cat "$requirements_file"
-        echo "-----------------------------"
-
-        # Process requirements file
-        while IFS= read -r package || [[ -n "$package" ]]; do
-            # Skip empty lines and comments
-            [[ -z "$package" || "$package" =~ ^[[:space:]]*# ]] && continue
-            
-            package=$(echo "$package" | tr -d '\r')  # Remove CR if present
-            
-            echo "Installing package: '$package'"
+        while read -r package; do
             if pip install "$package" &>/tmp/pip_install_log; then
                 echo "✅ Successfully installed: $package"
             else
@@ -157,9 +140,7 @@ install_requirements() {
                 cat /tmp/pip_install_log
             fi
         done < "$requirements_file"
-
-        echo 'deactivate venv'
-        deactivate
+		deactivate
     else
         echo "Error: $requirements_file not found."
         return 1
