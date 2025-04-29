@@ -121,13 +121,13 @@ install_requirements() {
         echo "Installing requirements from $requirements_file..."
 
         # Upgrade pip first
-        echo "Upgrading pip to the latest version..."
+        #echo "Upgrading pip to the latest version..."
         if python3 -m pip install --upgrade pip &>/tmp/pip_install_log; then
             echo "✅ pip successfully upgraded."
         else
             echo "❌ Failed to upgrade pip."
             echo "Error log:"
-            cat /tmp/pip_install_log
+            #cat /tmp/pip_install_log
             return 1
         fi
 
