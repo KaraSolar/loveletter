@@ -218,6 +218,7 @@ loveletter_extraction(){
 	clone_repo $extract_tag $repo_extraction
 	cd LoveLetterExtraction
 	sudo apt install sqlite3 -y
+	sudo apt install gawk -y
 	sqlite3 extraction_log.db < dates.sql
 	mkdir keys
 	python3 -m venv env
