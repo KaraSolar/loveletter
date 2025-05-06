@@ -61,6 +61,7 @@ class PassengerInput(ttk.Frame):
 
         self.passenger_number_label_and_buttons()
         self.action_buttons()
+        
 
     # _________________Methods_____________________________
 
@@ -94,6 +95,7 @@ class PassengerInput(ttk.Frame):
         self.trip_purposes_combobox: ttk.Combobox = ttk.Combobox(master=self.trip_purpose_and_go_back_frame,
                                                                 textvariable=self.trip_purpose_var,
                                                                 values=self.trip_purposes_config,
+                                                                state="readonly",
                                                                 bootstyle="info",
                                                                 font=("Digital-7", 20))
         self.trip_purposes_combobox.grid(row=1, column=0, sticky = "sew", pady=(0,20))
