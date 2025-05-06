@@ -61,7 +61,6 @@ class PassengerInput(ttk.Frame):
 
         self.passenger_number_label_and_buttons()
         self.action_buttons()
-        
 
     # _________________Methods_____________________________
 
