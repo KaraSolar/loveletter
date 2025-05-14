@@ -45,7 +45,7 @@ clean_dir() {
     local dest_dir=$(basename -s .git "$repo_url")
     if [[ -d $dest_dir ]]; then
         echo "Directory '$dest_dir' already exists. Deleting it..."
-        rm -rf "$dest_dir"
+        sudo rm -r -f "$dest_dir"
     fi
 }
 
