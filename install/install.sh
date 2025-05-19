@@ -95,7 +95,7 @@ loveletter_service(){
 	sudo systemctl start loveletter_extraction.timer
 
 	clean_dir "$repo_crons"
-	#rm -rf "install.sh"
+	rm -rf "install.sh"
 }
 
 python_upgrade(){
