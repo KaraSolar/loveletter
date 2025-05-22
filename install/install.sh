@@ -6,7 +6,7 @@ repo_extraction=https://github.com/KaraSolar/LoveLetterExtraction
 
 tags=($(git ls-remote --tags $repo | awk -F'/' '{print $NF}'))
 tag=$(git ls-remote --tags --sort="v:refname" $repo_crons | tail -n1 | awk -F'/' '{print $NF}')
-extract_tag=$(git ls-remote --tags --sort="v:refname" $repo_extraction | head -n1 | awk -F'/' '{print $NF}')
+extract_tag=$(git ls-remote --tags --sort="v:refname" $repo_extraction | tail -n1 | awk -F'/' '{print $NF}')
 
 log_stated_install(){
 	DISPLAY_VER=$(echo $INSTALL_VER | sed "s|~alpha||g" | sed "s|~beta||g")
