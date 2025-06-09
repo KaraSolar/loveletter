@@ -130,15 +130,6 @@ install_requirements() {
             return 1
         fi
 
-        while read -r package; do
-            if pip install "$package" &>/tmp/pip_install_log; then
-                echo "✅ Successfully installed: $package"
-            else
-                echo "❌ Failed to install: $package"
-                echo "Error log:"
-                cat /tmp/pip_install_log
-            fi
-        done < "$requirements_file"
 		#deactivate
     else
         echo "Error: $requirements_file not found."
@@ -168,6 +159,7 @@ clines(){
         tput el
     done
 }
+
 
 pendrive_check(){
 	if [ -d "$(pwd)/loveletter" ]; then
