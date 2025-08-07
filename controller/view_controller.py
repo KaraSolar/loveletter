@@ -15,15 +15,15 @@ class ViewController:
 
     def configure_data_display_buttons(self):
         self.view.data_display_frame.center_pane.end_trip_button.config(
-            command=lambda: self.view.raise_frame("finish_trip_frame"))
+            command=lambda:self.view.raise_frame("finish_trip_frame"))
         self.view.data_display_frame.center_pane.start_trip_button.config(
-            command=lambda: self.view.raise_frame("passenger_input_frame"))
+            command=lambda:self.view.raise_frame("passenger_input_frame"))
 
     def configure_passenger_input_buttons(self):
         self.view.passenger_input_frame.start_trip_button.config(
             command=self.change_initiate_trip_frame)
         self.view.passenger_input_frame.go_back_button.config(
-            command=lambda: self.view.raise_frame("data_display_frame"))
+            command=lambda:self.view.raise_frame("data_display_frame"))
 
     def change_initiate_trip_frame(self):
         if self.view.trip_purpose_validator():
@@ -32,13 +32,13 @@ class ViewController:
 
     def configure_initiate_trip_frame_buttons(self):
         self.view.initiate_trip_frame.no_button.config(
-            command=lambda: self.view.raise_frame("passenger_input_frame"))
+            command=lambda:self.view.raise_frame("passenger_input_frame"))
         self.view.initiate_trip_frame.yes_button.config(
             command=self.initiate_trip_listener)
 
     def configure_finish_trip_frame_buttons(self):
         self.view.finish_trip_frame.no_button.config(
-            command=lambda: self.view.raise_frame("data_display_frame"))
+            command=lambda:self.view.raise_frame("data_display_frame"))
         self.view.finish_trip_frame.yes_button.config(
             command=self.end_trip_listener)
 
@@ -47,13 +47,13 @@ class ViewController:
         trip_purpose = self.view.passenger_input_frame.trip_purpose_var.get()
         self.view.data_display_frame.show_trip_mode()
         self.view.raise_frame("data_display_frame")
-        self.data_base_queue.put({"type": "trip", "value": {"passenger_number": trip_passenger_qty,
-                                  "trip_purpose": trip_purpose}})
+        self.data_base_queue.put({"type":"trip", "value":{"passenger_number":trip_passenger_qty,
+                                                          "trip_purpose":trip_purpose}})
         self.trip_start_signal_event.set()
 
     def end_trip_listener(self):
         self.view.data_display_frame.show_dock_mode()
-        self.data_base_queue.put({"type": "end_trip"})
+        self.data_base_queue.put({"type":"end_trip"})
         self.trip_start_signal_event.clear()
         self.view.raise_frame("data_display_frame")
 
@@ -94,4 +94,5 @@ class ViewController:
     def update_speed(self, telemetry: dict) -> None:
         speed = telemetry.get("speed")
         speed_amount = speed if speed is not None else 0
+        speed_amount = round(speed_amount * 3.6, 2)  # Transform to km/h
         self.view.data_display_frame.center_pane.speed_indicator.configure(amountused=speed_amount)

@@ -111,9 +111,9 @@ class CenterPane(ttk.Frame):
                                          metersize=250,
                                          amountused=4,
                                          metertype="semi",
-                                         subtext="m/s",
+                                         subtext="km/h",
                                          interactive=False,
-                                         amounttotal=12,
+                                         amounttotal=20,
                                          arcrange=180,
                                          arcoffset=180,
                                          bootstyle="info", textfont="-size 26 -weight bold", subtextfont="-size 14", subtextstyle="light")
