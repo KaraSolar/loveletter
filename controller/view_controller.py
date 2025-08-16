@@ -53,13 +53,13 @@ class ViewController:
 
     def end_trip_listener(self):
         self.view.data_display_frame.show_dock_mode()
-        self.data_base_queue.put({"type":"end_trip"})
+        self.data_base_queue.put({"type": "end_trip"})
         self.trip_start_signal_event.clear()
         self.view.raise_frame("data_display_frame")
 
     def update_view(self, telemetry: dict) -> None:
         # Update Battery Power
-        self.update_battery_power(telemetry)
+        self.update_course(telemetry)
         # Update Battery State of Charge
         self.update_battery_soc(telemetry)
         # Update Solar Power
@@ -69,9 +69,11 @@ class ViewController:
         # Update Speed
         self.update_speed(telemetry)
 
-    def update_battery_power(self, telemetry: dict) -> None:
-        battery_power = telemetry.get("battery_power")
-        self.view.data_display_frame.left_pane.battery_power_variable.set(battery_power)
+    def update_course(self, telemetry: dict) -> None:
+        course = telemetry.get("course")
+        if course:
+            course = int(course / 100)
+        self.view.data_display_frame.left_pane.course_indicator_variable.set(course)
 
     def update_battery_soc(self, telemetry: dict) -> None:
         battery_soc = telemetry.get("battery_state_of_charge")
