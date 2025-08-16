@@ -4,7 +4,7 @@ database:
   # name can be "dev_telemetry", "test_telemetry" or "telemetry"
   # for dev, qa, and prod databases.
   name: 'telemetry.db'
-  trip_purposes: ['Escuela', 'Salud', 'Minga', 'Otros']
+  trip_purposes: ['Asamblea', 'Deporte', 'Escuela', 'Minga', 'Salud', 'Otros']
 
 cerbo_gx:
   server_ip: '169.254.1.2'
