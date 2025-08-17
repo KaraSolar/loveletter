@@ -58,7 +58,7 @@ class ViewController:
         self.view.raise_frame("data_display_frame")
 
     def update_view(self, telemetry: dict) -> None:
-        # Update Battery Power
+        # Update Course
         self.update_course(telemetry)
         # Update Battery State of Charge
         self.update_battery_soc(telemetry)
