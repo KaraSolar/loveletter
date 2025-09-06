@@ -26,6 +26,7 @@ import queue
 import threading
 import ttkbootstrap as ttk
 import time
+import copy
 from model.modbus_query import ModbusQuery
 from model.telemetry_database import TelemetryDatabase
 from model.canbus_query import CanBusQuery
@@ -169,7 +170,9 @@ class WorkerCanBusGps(threading.Thread):
             self.__telemetry["gps_number_of_satellites"] = gps_telemetry["gps_number_of_satellites"]
             self.__telemetry["altitude1"] = gps_telemetry["altitude"]
             # Put in the queue
-            self.queue_view.put(self.__telemetry.copy())
+            telemetry_modbus_copy = copy.deepcopy(self.__telemetry)
+            self.queue_worker_database.put({"type": "telemetry", "value": telemetry_modbus_copy})
+            self.queue_view.put(telemetry_modbus_copy)
             if not self.stop_workers_signal.is_set():
                 self.event_generate("<<update_view>>")  # Blocking event tkinter events are not thread safe.
             if self.trip_mode_flag_signal.is_set():

@@ -1,3 +1,4 @@
+import copy
 from pymodbus.exceptions import ModbusException, ModbusIOException, ConnectionException
 from pymodbus.client.sync import ModbusTcpClient
 import re
@@ -135,7 +136,7 @@ class ModbusQuery:
         self.set_telemetry_from_register_values()
         self.set_scaling()
         self.set_negative_values()
-        return self.__telemetry.copy()
+        return copy.deepcopy(self.__telemetry)
 
     def disconnect(self) -> int:
         """
