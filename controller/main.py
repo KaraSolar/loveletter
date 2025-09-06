@@ -33,8 +33,6 @@ class Controller:
                                                      queue_view=self.queue_view,
                                                      server_ip_config=self.telemetry_config["config"])
         else:
-            print(self.telemetry_config)
-            print("Hi there this shouldnt happen!!!")
             self.worker_get_telemetry = WorkerCanBusGps(queue_worker_database=self.queue_worker_database,
                                                         stop_workers_signal=self.stop_workers_signal,
                                                         event_generate=self.view.root.event_generate,

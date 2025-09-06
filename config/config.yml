@@ -20,7 +20,7 @@ database:
 telemetry:
   target: 'cerbo_gx' # either cerbo_gx or canbus
   cerbo_gx:
-    server_ip: '127.0.0.1' # '169.254.1.2'
+    server_ip: '169.254.1.2'
   canbus:
     channel: 'can0'
 
