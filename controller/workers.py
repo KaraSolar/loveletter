@@ -28,6 +28,8 @@ import ttkbootstrap as ttk
 import time
 from model.modbus_query import ModbusQuery
 from model.telemetry_database import TelemetryDatabase
+from model.canbus_query import CanBusQuery
+from model.gps_query import GPSQuery
 
 
 class WorkerModbus(threading.Thread):
@@ -117,4 +119,64 @@ class WorkerDatabase(threading.Thread):
                 telemetry_database.close_connection()
                 raise ValueError("Not a valid type.")
         telemetry_database.close_connection()
+        return 0
+
+
+class WorkerCanBusGps(threading.Thread):
+    def __init__(self, queue_worker_database: queue.Queue, stop_workers_signal: threading.Event,
+                 event_generate: ttk.Window.event_generate, trip_mode_flag_signal: threading.Event,
+                 queue_view: queue.Queue, channel_config: str):
+
+        super().__init__(daemon=False)
+        self.queue_worker_database = queue_worker_database
+        self.stop_workers_signal = stop_workers_signal
+        self.event_generate = event_generate
+        self.trip_mode_flag_signal = trip_mode_flag_signal
+        self.queue_view = queue_view
+        self.channel_config = channel_config
+        self.__telemetry: dict = {"battery_voltage": None, "battery_current": None,
+                                  "battery_power": None, "battery_state_of_charge": None,
+                                  "pv-dc-coupled_power": None, "pv-dc-coupled_current": None,
+                                  "latitude1": None, "latitude2": None, "longitude1": None,
+                                  "longitude2": None, "course": None, "speed": None,
+                                  "gps_fix": None, "gps_number_of_satellites": None,
+                                  "altitude1": None, "altitude2": None}
+
+    def run(self) -> int:
+        """Start the querying loop in the WorkerModbus thread.
+
+        This method continuously queries the Modbus, formats telemetry data,
+        and sends it to the appropriate queues. It also updates the view when required.
+
+        :return: 0 when terminated.
+        """
+        canbus_query = CanBusQuery(
+            channel=self.channel_config)  # Initialize in the new thread to avoid race conditions.
+        gps_query = GPSQuery()
+        while not self.stop_workers_signal.is_set():
+            battery_telemetry: dict = canbus_query.read_and_format_can_bus_message()
+            # Battery Telemetry (CanBus)
+            self.__telemetry["battery_voltage"] = battery_telemetry["voltage"]
+            self.__telemetry["battery_current"] = battery_telemetry["current"]
+            self.__telemetry["battery_state_of_charge"] = battery_telemetry["soc"]
+            # GPS Telemetry (GPS)
+            gps_telemetry: dict = gps_query.read_and_format_gps_signal()
+            self.__telemetry["latitude1"] = gps_telemetry["latitude"]
+            self.__telemetry["longitude1"] = gps_telemetry["longitude"]
+            self.__telemetry["course"] = gps_telemetry["course"]
+            self.__telemetry["speed"] = gps_telemetry["speed"]
+            self.__telemetry["gps_fix"] = gps_telemetry["gps_fix"]
+            self.__telemetry["gps_number_of_satellites"] = gps_telemetry["gps_number_of_satellites"]
+            self.__telemetry["altitude1"] = gps_telemetry["altitude"]
+            # Put in the queue
+            self.queue_view.put(self.__telemetry.copy())
+            if not self.stop_workers_signal.is_set():
+                self.event_generate("<<update_view>>")  # Blocking event tkinter events are not thread safe.
+            if self.trip_mode_flag_signal.is_set():
+                time.sleep(1)
+            else:
+                if self.trip_mode_flag_signal.wait(timeout=15):
+                    continue
+        canbus_query.disconnect()
+        gps_query.disconnect()
         return 0
