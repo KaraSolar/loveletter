@@ -54,11 +54,10 @@ class PassengerInput(ttk.Frame):
         self.columnconfigure((0,1,2), weight= 1, uniform="a")
 
         self.rowconfigure((0,1,2), weight=1, uniform="a")
-        self.trip_purpose_and_go_back_frame = ttk.Frame(self)
-        self.trip_purpose_and_go_back_frame.columnconfigure(0, weight=1, uniform="a")
-        self.trip_purpose_and_go_back_frame.rowconfigure(0,weight=1, uniform="a")
-        self.trip_purpose_and_go_back_frame.rowconfigure(1, weight=3, uniform="a")
-
+        self.trip_purpose_and_start_trip_frame = ttk.Frame(self)
+        self.trip_purpose_and_start_trip_frame.columnconfigure(0, weight=1, uniform="a")
+        self.trip_purpose_and_start_trip_frame.rowconfigure(0, weight=1, uniform="a")
+        self.trip_purpose_and_start_trip_frame.rowconfigure(1, weight=1, uniform="a")
         self.passenger_number_label_and_buttons()
         self.action_buttons()
 
@@ -91,28 +90,28 @@ class PassengerInput(ttk.Frame):
 
 
         # _______________Passenger Indicator______________
-        self.trip_purposes_combobox: ttk.Combobox = ttk.Combobox(master=self.trip_purpose_and_go_back_frame,
+        self.trip_purposes_combobox: ttk.Combobox = ttk.Combobox(master=self.trip_purpose_and_start_trip_frame,
                                                                 textvariable=self.trip_purpose_var,
                                                                 values=self.trip_purposes_config,
                                                                 state="readonly",
                                                                 bootstyle="info",
                                                                 font=("Digital-7", 20))
-        self.trip_purposes_combobox.grid(row=1, column=0, sticky = "sew", pady=(0,20))
-        self.trip_purpose_and_go_back_frame.grid(row=0, column=1, sticky="nsew")
+        self.trip_purposes_combobox.grid(row=0, column=0, sticky="ew")
 
     def action_buttons(self) -> None:
         # _______________Start Trip________________________
-        self.start_trip_button:ttk.Button = ttk.Button(master=self,
+        self.start_trip_button:ttk.Button = ttk.Button(master=self.trip_purpose_and_start_trip_frame,
                                             text="Iniciar Viaje",
                                             style="info.TButton")
-        self.start_trip_button.grid(row=2, column=1, sticky="ew")
+        self.start_trip_button.grid(row=1, column=0, sticky="new")
+        self.trip_purpose_and_start_trip_frame.grid(row=2, column=1, sticky="nsew")
 
 
         # _______________Go back _________________________
-        self.go_back_button:ttk.Button = ttk.Button(master=self.trip_purpose_and_go_back_frame,
+        self.go_back_button:ttk.Button = ttk.Button(master=self,
                                          text="Regresar",
                                          style="info.TButton")
-        self.go_back_button.grid(row=0, column=0, sticky="new", pady=(25,0), rowspan=2)
+        self.go_back_button.grid(row=0, column=1, sticky="new", pady=25, rowspan=2)
 
 
     # ________________command methods_____________________

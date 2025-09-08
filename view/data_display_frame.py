@@ -156,7 +156,7 @@ class RightPane(ttk.Frame):
 
         self.load_power_frame = self.title_widget_frame()
         self.title_load_power_label = ttk.Label(self.load_power_frame,
-                                                text="Descarga del Motor (w)", font=("Digital-7", 17))
+                                                text="Descarga del Motor w", font=("Digital-7", 17))
         self.load_power_variable = ttk.Variable(value="0")
         self.load_power_label = ttk.Label(self.load_power_frame,
                                           textvariable=self.load_power_variable,
@@ -167,7 +167,7 @@ class RightPane(ttk.Frame):
 
         self.solar_power_frame = self.title_widget_frame()
         self.title_solar_power_label = ttk.Label(self.solar_power_frame,
-                                                 text="Recarga del Techo Solar (w)", font=("Digital-7", 17))
+                                                 text="Recarga Techo Solar w", font=("Digital-7", 17))
         self.solar_power_variable = ttk.Variable(value="0")
         self.solar_power_label = ttk.Label(self.solar_power_frame,
                                            textvariable=self.solar_power_variable,

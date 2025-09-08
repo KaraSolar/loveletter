@@ -71,8 +71,6 @@ class ViewController:
 
     def update_course(self, telemetry: dict) -> None:
         course = telemetry.get("course")
-        if course:
-            course = int(course / 100)
         self.view.data_display_frame.left_pane.course_indicator_variable.set(course)
 
     def update_battery_soc(self, telemetry: dict) -> None:
@@ -86,12 +84,7 @@ class ViewController:
 
     def update_load_power(self, telemetry: dict) -> None:
         battery_power = telemetry.get("battery_power")
-        solar_power = telemetry.get("pv-dc-coupled_power")
-        if battery_power is not None and solar_power is not None:
-            load_power = battery_power - solar_power
-            self.view.data_display_frame.right_pane.load_power_variable.set(load_power)
-        else:
-            self.view.data_display_frame.right_pane.load_power_variable.set(None)
+        self.view.data_display_frame.right_pane.load_power_variable.set(battery_power)
 
     def update_speed(self, telemetry: dict) -> None:
         speed = telemetry.get("speed")
