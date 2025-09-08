@@ -6,7 +6,7 @@ class CanBusQuery:
     def __init__(self, channel="can0"):
         self.channel = channel
         self.filters = [
-            {"can_id": 0x18F003A0, "can_mask": 0x1FFFFFFF, "extended": True},
+            {"can_id":0x18F003A0, "can_mask":0x1FFFFFFF, "extended":True},
         ]
         self.bus = can.interface.Bus(channel=self.channel,
                                      interface='socketcan',
@@ -36,6 +36,10 @@ class CanBusQuery:
             if msg:
                 msg = self.decoder(msg=msg)
                 return msg
+            else:
+                return {"voltage": None, "current": None, "soc": None,
+                        "battery_power": None}
+
         except:
             pass
 
@@ -49,7 +53,8 @@ class CanBusQuery:
         current = (raw_current * 0.05) - 1600
         # cell_sum = (raw_cell_sum * 0.05) + 0
         soc = (raw_soc * 0.1) + 0
-        return {"voltage": voltage, "current": current, "soc": soc}
+        return {"voltage": voltage, "current": current, "soc": soc,
+                "battery_power": voltage * current}
 
     def disconnect(self):
         self.bus.shutdown()

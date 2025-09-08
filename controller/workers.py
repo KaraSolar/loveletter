@@ -160,6 +160,7 @@ class WorkerCanBusGps(threading.Thread):
             self.__telemetry["battery_voltage"] = battery_telemetry["voltage"]
             self.__telemetry["battery_current"] = battery_telemetry["current"]
             self.__telemetry["battery_state_of_charge"] = battery_telemetry["soc"]
+            self.__telemetry["battery_power"] = battery_telemetry["battery_power"]
             # GPS Telemetry (GPS)
             gps_telemetry: dict = gps_query.read_and_format_gps_signal()
             self.__telemetry["latitude1"] = gps_telemetry["latitude"]
