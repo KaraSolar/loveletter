@@ -71,7 +71,7 @@ class ViewController:
 
     def update_course(self, telemetry: dict) -> None:
         course = telemetry.get("course")
-        self.view.data_display_frame.left_pane.course_indicator_variable.set(course)
+        self.view.data_display_frame.left_pane.course_indicator_variable.set(int(course))
 
     def update_battery_soc(self, telemetry: dict) -> None:
         battery_soc = telemetry.get("battery_state_of_charge")
