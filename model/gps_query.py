@@ -1,18 +1,21 @@
-# import gpsd
-import random
+import gpsd
 
 
 class GPSQuery:
     def __init__(self):
-        pass
-        # gpsd.connect()
+        gpsd.connect()
 
     @staticmethod
     def read_and_format_gps_signal():
-        return {"latitude": 0, "longitude": 0, "course": random.randint(0, 359),
-                "speed": random.uniform(0, 5.55), "gps_fix": 10,
-                "gps_number_of_satellites": 10, "altitude": 2800}
+        packet = gpsd.get_current()
+        return {"latitude": packet.lat,
+                "longitude": packet.lon,
+                "course": packet.track,
+                "speed": packet.hspeed,
+                "gps_fix": packet.mode,
+                "gps_number_of_satellites": packet.sats,
+                "altitude": packet.alt}
 
     @staticmethod
     def disconnect():
-        return 0
+        return 0  # gpsd does not have a disconnect method, the socket will be garbage collected.
