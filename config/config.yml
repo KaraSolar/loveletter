@@ -8,12 +8,12 @@ database:
                   'Chacra',
                   'Deporte',
                   'Escuela',
-                  'Invitacion Comunitario',
+                  'Invitacion',
                   'Minga',
                   'Paseo',
                   'Pesca',
                   'Salud',
-                  'Traslado Empleados',
+                  'Traslado',
                   'Turismo',
                   'Otros']
 
