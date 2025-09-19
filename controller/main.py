@@ -12,7 +12,7 @@ from .workers import WorkerDatabase, WorkerModbus, WorkerCanBusGps
 
 
 class Controller:
-    def __init__(self, view, db_name, telemetry_config:dict, passenger_number_config: dict, trip_purposes_config: list):
+    def __init__(self, view, db_name, telemetry_config: dict, passenger_number_config: dict, trip_purposes_config: list):
         self.view = view
         self.db_name = db_name
         self.passenger_number_config: dict = passenger_number_config
@@ -23,7 +23,8 @@ class Controller:
         self.trip_mode_flag_signal = threading.Event()
         self.queue_worker_database = queue.Queue(maxsize=0)
         self.queue_view = queue.Queue(maxsize=0)
-        self.view_controller = ViewController(self.view, self.queue_worker_database, self.trip_mode_flag_signal)
+        self.view_controller = ViewController(self.view, self.queue_worker_database, self.trip_mode_flag_signal,
+                                              self.telemetry_config["target"])
         self.closing_keys()
         if self.telemetry_config["target"] == "cerbo_gx":
             self.worker_get_telemetry = WorkerModbus(queue_worker_database=self.queue_worker_database,
