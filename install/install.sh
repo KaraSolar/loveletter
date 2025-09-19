@@ -3,6 +3,8 @@ clear
 repo=https://github.com/KaraSolar/loveletter.git
 repo_crons=https://github.com/KaraSolar/Rpi_Crons.git
 repo_extraction=https://github.com/KaraSolar/LoveLetterExtraction
+yaml_file="loveletter/config/config.yml"
+TARGET=""
 
 tags=($(git ls-remote --tags $repo | awk -F'/' '{print $NF}'))
 tag=$(git ls-remote --tags --sort="v:refname" $repo_crons | tail -n1 | awk -F'/' '{print $NF}')
@@ -81,6 +83,9 @@ loveletter_service(){
 	sudo cp $(pwd)/Rpi_Crons/daily_restart.timer /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/loveletter_extraction.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/loveletter_extraction.timer /etc/systemd/system/
+  if [[ "$TARGET" == "canbus" ]]; then
+      sudo $(pwd)/Rpi_Crons/can0.service /etc/systemd/system/
+  fi
 	add_or_replace_variable "WorkingDirectory" "$(pwd)/loveletter" "/etc/systemd/system/loveletter.service"
 	add_or_replace_variable "ExecStart" "$(pwd)/loveletter/start.sh" "/etc/systemd/system/loveletter.service"
 	add_or_replace_variable "WorkingDirectory" "$(pwd)/LoveLetterExtraction" "/etc/systemd/system/loveletter_extraction.service"
@@ -90,9 +95,11 @@ loveletter_service(){
 	sudo systemctl enable loveletter.service
 	sudo systemctl start loveletter.service
  	sudo systemctl enable daily_restart.timer
-  	sudo systemctl start daily_restart.timer
+  sudo systemctl start daily_restart.timer
 	sudo systemctl enable loveletter_extraction.timer
 	sudo systemctl start loveletter_extraction.timer
+	sudo systemctl enable can0.service
+	sudo systemctl start can0.service
 
 	clean_dir "$repo_crons"
 	rm -rf "install.sh"
@@ -229,6 +236,32 @@ loveletter_extraction(){
 	cd ..
 }
 
+choose_data_source() {
+    while true; do
+        echo "Choose a data source option:"
+        echo "1) Keep current target (Modbus)"
+        echo "2) Change target to 'canbus'"
+        read -rp "Enter 1 or 2: " choice
+
+        case "$choice" in
+            1)
+                echo "Default config for Modbus."
+                TARGET="cerbo_gx"
+                break
+                ;;
+            2)
+                sed -i "s/target: '.*'/target: 'canbus'/" "$yaml_file"
+                echo "Default configuration for CanBus."
+                TARGET="canbus"
+                break
+                ;;
+            *)
+                echo "❌ Invalid choice. Please enter 1 or 2."
+                ;;
+        esac
+    done
+}
+
 echo "Repo Installing: $repo"
 echo -e "________________________Avalaible Tags_________________________\n"
 for i in "${!tags[@]}"; do
@@ -253,6 +286,7 @@ else
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
 		repo_install
+		choose_data_source
 		loveletter_service
 		pendrive_check
 		loveletter_extraction
@@ -261,6 +295,7 @@ else
 		INSTALL_VER=${tags[response-1]}
 		log_stated_install
 		repo_install
+		choose_data_source
 		loveletter_service
 		pendrive_check
 		loveletter_extraction
