@@ -169,13 +169,13 @@ class RightPane(ttk.Frame):
         self.title_solar_power_label = ttk.Label(self.solar_power_frame,
                                                  text="Recarga Techo", font=("Digital-7", 17))
         self.solar_power_variable = ttk.Variable(value="0")
+        self.load_power_charge_variable = ttk.Variable(value="0")  # Only used if CanBus
         self.solar_power_label = ttk.Label(self.solar_power_frame,
                                            textvariable=self.solar_power_variable,
                                            font=("Digital-7", 20)
                                            )
         self.title_solar_power_label.grid(column=0, row=0)
         self.solar_power_label.grid(column=0, row=1)
-
         self.place_widgets()
 
     def frame_configuration(self):
@@ -193,3 +193,7 @@ class RightPane(ttk.Frame):
     def place_widgets(self):
         self.load_power_frame.grid(row=1, column=0, sticky="nsew")
         self.solar_power_frame.grid(row=2, column=0, sticky="nesw")
+
+    def update_label_titles(self):
+        self.title_solar_power_label.config(text="Carga Motor")
+        self.solar_power_label.config(textvariable=self.load_power_charge_variable)

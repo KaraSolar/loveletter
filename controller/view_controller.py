@@ -4,14 +4,17 @@ import threading
 
 class ViewController:
     def __init__(self, view, data_base_queue: queue.Queue,
-                 trip_start_signal_event: threading.Event):
+                 trip_start_signal_event: threading.Event,
+                 telemetry_config: str):
         self.view = view
         self.data_base_queue = data_base_queue
         self.trip_start_signal_event = trip_start_signal_event
+        self.telemetry_config = telemetry_config
         self.configure_data_display_buttons()
         self.configure_passenger_input_buttons()
         self.configure_initiate_trip_frame_buttons()
         self.configure_finish_trip_frame_buttons()
+        self.update_right_pane_titles()
 
     def configure_data_display_buttons(self):
         self.view.data_display_frame.center_pane.end_trip_button.config(
@@ -53,7 +56,7 @@ class ViewController:
 
     def end_trip_listener(self):
         self.view.data_display_frame.show_dock_mode()
-        self.data_base_queue.put({"type": "end_trip"})
+        self.data_base_queue.put({"type":"end_trip"})
         self.trip_start_signal_event.clear()
         self.view.raise_frame("data_display_frame")
 
@@ -62,12 +65,16 @@ class ViewController:
         self.update_course(telemetry)
         # Update Battery State of Charge
         self.update_battery_soc(telemetry)
-        # Update Solar Power
-        self.update_solar_power(telemetry)
-        # Update Load Power
-        self.update_load_power(telemetry)
         # Update Speed
         self.update_speed(telemetry)
+        # Right Pane Widgets
+        if self.telemetry_config == "canbus":
+            self.update_load_power_can_bus(telemetry)
+        else:
+            # Update Solar Power
+            self.update_solar_power(telemetry)
+            # Update Load Power
+            self.update_load_power(telemetry)
 
     def update_course(self, telemetry: dict) -> None:
         course = telemetry.get("course")
@@ -87,8 +94,24 @@ class ViewController:
         battery_power = telemetry.get("battery_power")
         self.view.data_display_frame.right_pane.load_power_variable.set(battery_power)
 
+    def update_load_power_can_bus(self, telemetry: dict) -> None:
+        battery_power = telemetry.get("battery_power")
+        if battery_power is None:
+            self.view.data_display_frame.right_pane.load_power_variable.set(None)
+            self.view.data_display_frame.right_pane.load_power_charge_variable.set(None)
+        elif battery_power > 0:
+            self.view.data_display_frame.right_pane.load_power_charge_variable.set(battery_power)
+            self.view.data_display_frame.right_pane.load_power_variable.set(0)
+        else:
+            self.view.data_display_frame.right_pane.load_power_variable.set(battery_power)
+            self.view.data_display_frame.right_pane.load_power_charge_variable.set(0)
+
     def update_speed(self, telemetry: dict) -> None:
         speed = telemetry.get("speed")
         speed_amount = speed if speed is not None else 0
         speed_amount = round(speed_amount * 3.6, 2)  # Transform to km/h
         self.view.data_display_frame.center_pane.speed_indicator.configure(amountused=speed_amount)
+
+    def update_right_pane_titles(self):
+        if self.telemetry_config == "canbus":
+            self.view.data_display_frame.right_pane.update_label_titles()
