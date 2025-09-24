@@ -84,7 +84,7 @@ loveletter_service(){
 	sudo cp $(pwd)/Rpi_Crons/loveletter_extraction.service /etc/systemd/system/
 	sudo cp $(pwd)/Rpi_Crons/loveletter_extraction.timer /etc/systemd/system/
   if [[ "$TARGET" == "canbus" ]]; then
-      sudo $(pwd)/Rpi_Crons/can0.service /etc/systemd/system/
+      sudo cp $(pwd)/Rpi_Crons/can0.service /etc/systemd/system/
   fi
 	add_or_replace_variable "WorkingDirectory" "$(pwd)/loveletter" "/etc/systemd/system/loveletter.service"
 	add_or_replace_variable "ExecStart" "$(pwd)/loveletter/start.sh" "/etc/systemd/system/loveletter.service"
