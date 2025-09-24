@@ -92,14 +92,16 @@ loveletter_service(){
 	add_or_replace_variable "ExecStart" "$(pwd)/LoveLetterExtraction/run.sh" "/etc/systemd/system/loveletter_extraction.service"
 
 	sudo systemctl daemon-reload
+  if [[ "$TARGET" == "canbus" ]]; then
+	sudo systemctl enable can0.service
+	sudo systemctl start can0.service
+  fi
 	sudo systemctl enable loveletter.service
 	sudo systemctl start loveletter.service
  	sudo systemctl enable daily_restart.timer
     sudo systemctl start daily_restart.timer
 	sudo systemctl enable loveletter_extraction.timer
 	sudo systemctl start loveletter_extraction.timer
-	sudo systemctl enable can0.service
-	sudo systemctl start can0.service
 
 	clean_dir "$repo_crons"
 	rm -rf "install.sh"
