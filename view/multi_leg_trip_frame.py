@@ -1,16 +1,13 @@
 import ttkbootstrap as ttk
 
 
-class PassengerInput(ttk.Frame):
-    def __init__(self, master: ttk.Window, label_font_size: tuple, passenger_number_config):
+class MultiLegTrip(ttk.Frame):
+    def __init__(self, master: ttk.Window, label_font_size: tuple):
         super().__init__(master)
 
         # ____________Initialize Variables __________
-        self.passenger_number_config = passenger_number_config
-        self.max_passenger: int = self.passenger_number_config["max"]
-        self.min_passenger: int = self.passenger_number_config["min"]
         self.label_font_size: tuple = label_font_size
-        self.passenger_number_var: ttk.IntVar = ttk.IntVar(value=self.min_passenger)
+        self.multi_leg_trip_var: ttk.BooleanVar = ttk.BooleanVar(value=False)
 
         # ____________FrameConfiguration_____________
         self.columnconfigure(0, weight=1)
@@ -19,8 +16,8 @@ class PassengerInput(ttk.Frame):
         self.rowconfigure(2, weight=1)   # Navigation row
         self.center_dynamic_frame = ttk.Frame(self)
         self.center_dynamic_frame.grid(row=1, column=0, sticky="nsew")
-        self.center_dynamic_frame.columnconfigure((0, 1, 2), weight=1)
-        self.center_dynamic_frame.rowconfigure(0, weight=1)   # Title row
+        self.center_dynamic_frame.columnconfigure(index=(0, 1), weight=1)
+        self.center_dynamic_frame.rowconfigure(0, weight=1)
 
         self._build_title_frame()
         self._build_buttons_frame()
@@ -33,38 +30,22 @@ class PassengerInput(ttk.Frame):
 
         # _____________Passenger Number Buttons____________
 
-        self.decrease_passenger_button: ttk.Button = ttk.Button(master=self.center_dynamic_frame,
-                                                                text="Menos",
+        self.not_multileg_trip_button: ttk.Button = ttk.Button(master=self.center_dynamic_frame,
+                                                                text="Si",
                                                                 style="info.TButton",
-                                                                padding=(10, 20),
-                                                                command=self.decrease_passenger_number)
-        self.decrease_passenger_button.grid(row=0, column=0, sticky="ew")
-
-        self.increase_passenger_button: ttk.Button = ttk.Button(master=self.center_dynamic_frame,
-                                                                style="info.TButton",
-                                                                text="Mas",
                                                                 padding=(10, 20),
                                                                 width=6,
-                                                                command=self.increase_passenger_number)
-        self.increase_passenger_button.grid(row=0, column=2, sticky="ew")
+                                                                command=lambda:self.multi_leg_trip_var.set(False)
+                                                                )
+        self.not_multileg_trip_button.grid(row=0, column=0, sticky="ew", padx=50)
 
-        # _______________Passenger Indicator______________
-        self.passenger_number_label: ttk.Label = ttk.Label(master=self.center_dynamic_frame,
-                                                           textvariable=self.passenger_number_var,
-                                                           font=("Digital-7", 50))
-        self.passenger_number_label.grid(row=0, column=1)
-
-
-    # ________________command methods_____________________
-    def decrease_passenger_number(self) -> None:
-        n: int = self.passenger_number_var.get()
-        if n > self.min_passenger:
-            self.passenger_number_var.set(n - 1)
-
-    def increase_passenger_number(self) -> None:
-        n: int = self.passenger_number_var.get()
-        if n < self.max_passenger:
-            self.passenger_number_var.set(n + 1)
+        self.yes_multileg_trip_button: ttk.Button = ttk.Button(master=self.center_dynamic_frame,
+                                                                style="info.TButton",
+                                                                text="No",
+                                                                padding=(10, 20),
+                                                                width=6,
+                                                                command=lambda:self.multi_leg_trip_var.set(True))
+        self.yes_multileg_trip_button.grid(row=0, column=1, sticky="ew", padx=50)
 
     # _________________ Row 0 — Title _____________________________
     def _build_title_frame(self) -> None:
@@ -74,7 +55,7 @@ class PassengerInput(ttk.Frame):
 
         ttk.Label(
             title_frame,
-            text="Seleccionar Numero de Pasajeros",
+            text="El viaje tiene destinos múltiples?",
             font=(*self.label_font_size, "bold"),
             anchor="center",
         ).grid(row=0, column=0, sticky="ew")

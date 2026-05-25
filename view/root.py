@@ -5,16 +5,19 @@ class Root(ttk.Window):
         super().__init__(themename="cyborg",
                          title="Love Letter")
         self.geometry("800x500+0+0")
-        self.after(4000, lambda: self.attributes("-fullscreen", True))
+        #self.after(4000, lambda: self.attributes("-fullscreen", True))
         self.resizable(False,False)
         self.update_idletasks()
         # Title fonts
         # Indicator (Label Fonts)
         # Clock Font (could also work for battery gauge for example)
         self.title_font: tuple = ("Digital-7", 20)
-        self.indicator_font: tuple = ("Digital-7", 18)
+        self.indicator_font: tuple = ("Digital-7", 12)
         style = ttk.Style()
         style.configure('info.TButton', font=self.title_font)
+        style.configure("secondary.TButton", font=self.indicator_font)
+        style.configure("success.TButton", font=self.indicator_font)
+        style.configure("Debug.TFrame", background="red")
         self.option_add("*TCombobox*Listbox*Font", self.title_font)
 
     def get_screen_resolution(self) -> tuple:

@@ -4,18 +4,33 @@ database:
   # name can be "dev_telemetry", "test_telemetry" or "telemetry"
   # for dev, qa, and prod databases.
   name: 'telemetry.db'
-  trip_purposes: ['Asamblea',
-                  'Chacra',
+  trip_purposes: ['Pesca',
+                  'Caceria',
+                  'Chakra',
+                  'Mingas comunitarias',
                   'Deporte',
-                  'Escuela',
-                  'Invitacion Comunitario',
-                  'Minga',
-                  'Paseo',
-                  'Pesca',
                   'Salud',
-                  'Traslado Empleados',
+                  'Educacion',
+                  'Trabajo',
                   'Turismo',
-                  'Otros']
+                  'Asamblea',
+                  'Reuniones Comunitarias',
+                  'Visitas (Guayusa)',
+                  'Aniversario',
+                  'Monitoreo Territorial',
+                  'Viaje Institucional',
+                  'Apoyo Tecnico',
+                  'Otro'
+                  ]
+
+  captain_config: ["Domingo M",
+                   "Mauro Mukucham",
+                   "Santiago",
+                   "Roberto",
+                   "Olger",
+                   "Efren",
+                   "Federico"
+                  ]
 
 cerbo_gx:
   server_ip: '169.254.1.2'

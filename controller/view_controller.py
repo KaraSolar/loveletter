@@ -1,6 +1,8 @@
 import queue
 import threading
 
+# La idea es:
+# 1. Iniciar Viaje ve a
 
 class ViewController:
     def __init__(self, view, data_base_queue: queue.Queue,
@@ -9,9 +11,10 @@ class ViewController:
         self.data_base_queue = data_base_queue
         self.trip_start_signal_event = trip_start_signal_event
         self.configure_data_display_buttons()
-        self.configure_passenger_input_buttons()
         self.configure_initiate_trip_frame_buttons()
         self.configure_finish_trip_frame_buttons()
+        self.configure_continue_buttons()
+        self.configure_go_back_buttons()
 
     def configure_data_display_buttons(self):
         self.view.data_display_frame.center_pane.end_trip_button.config(
@@ -19,11 +22,33 @@ class ViewController:
         self.view.data_display_frame.center_pane.start_trip_button.config(
             command=lambda:self.view.raise_frame("passenger_input_frame"))
 
-    def configure_passenger_input_buttons(self):
-        self.view.passenger_input_frame.start_trip_button.config(
-            command=self.change_initiate_trip_frame)
+    def configure_continue_buttons(self):
+        self.view.passenger_input_frame.continue_button.config(
+            command=lambda:self.view.raise_frame("captain_information_frame")
+        )
+        self.view.captain_information_frame.continue_button.config(
+            command=lambda:self.view.raise_frame("trip_purposes_frame")
+        )
+        self.view.trip_purposes_frame.continue_button.config(
+            command=lambda:self.view.raise_frame("multi_leg_trip_frame")
+        )
+        self.view.multi_leg_trip_frame.continue_button.config(
+            command=lambda:self.change_initiate_trip_frame()
+        )
+
+    def configure_go_back_buttons(self):
+        self.view.trip_purposes_frame.go_back_button.config(
+            command=lambda:self.view.raise_frame("captain_information_frame")
+        )
+        self.view.captain_information_frame.go_back_button.config(
+            command=lambda:self.view.raise_frame("passenger_input_frame")
+        )
         self.view.passenger_input_frame.go_back_button.config(
-            command=lambda:self.view.raise_frame("data_display_frame"))
+            command=lambda:self.view.raise_frame("data_display_frame")
+        )
+        self.view.multi_leg_trip_frame.go_back_button.config(
+            command=lambda:self.view.raise_frame("trip_purposes_frame")
+        )
 
     def change_initiate_trip_frame(self):
         if self.view.trip_purpose_validator():
@@ -44,7 +69,7 @@ class ViewController:
 
     def initiate_trip_listener(self):
         trip_passenger_qty = self.view.passenger_input_frame.passenger_number_var.get()
-        trip_purpose = self.view.passenger_input_frame.trip_purpose_var.get()
+        trip_purpose = self.view.trip_purposes_frame.trip_purpose_var.get()
         self.view.data_display_frame.show_trip_mode()
         self.view.raise_frame("data_display_frame")
         self.data_base_queue.put({"type":"trip", "value":{"passenger_number":trip_passenger_qty,

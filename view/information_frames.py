@@ -2,46 +2,74 @@ import ttkbootstrap as ttk
 
 
 class InitiateTripFrame(ttk.Frame):
-    def __init__(self, master: ttk.Window, passenger_number_var: ttk.IntVar, trip_purposes_var: ttk.StringVar):
+    def __init__(self, master: ttk.Window, passenger_number_var: ttk.IntVar, trip_purposes_var: ttk.StringVar,
+                 captains_var: ttk.StringVar, multi_leg_trip_var: ttk.BooleanVar):
         super().__init__(master)
+        # Class args
         self.passenger_number_var = passenger_number_var
         self.trip_purposes_var = trip_purposes_var
+        self.captains_var = captains_var
+        self.multi_leg_trip_var = multi_leg_trip_var
+
+        # class frame configuration
         self.columnconfigure((0, 1), weight=1, uniform="a")
         self.rowconfigure((0, 1), weight=1, uniform="a")
-        self.initiate_trip_text_var_pass_number = ttk.StringVar()
-        self.initiate_trip_text_var_trip_purpose = ttk.StringVar()
         self.labels_frame = ttk.Frame(self)
         self.labels_frame.columnconfigure(0, weight=1, uniform="a")
-        self.labels_frame.rowconfigure((0, 1), weight=1, uniform="a")
+        self.labels_frame.rowconfigure((0, 1, 2, 3, 4), weight=1, uniform="a")
+
+        # displaying vars
+        self.initiate_trip_text_var_pass_number = ttk.StringVar()
+        self.initiate_trip_text_var_trip_purpose = ttk.StringVar()
+        self.initiate_trip_text_var_captain = ttk.StringVar()
+        self.initiate_trip_text_var_multiple_dest = ttk.StringVar()
+
+        # Frame packing
         self.labels_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
-        self.initiate_trip_label_pass_number = ttk.Label(master=self.labels_frame,
-                                             textvariable=self.initiate_trip_text_var_pass_number,
+        self.initiate_trip_title = ttk.Label(master=self.labels_frame,
+                                             text="Iniciar viaje con:",
                                              font=("Digital-7", 21))
-        self.initiate_trip_label_pass_number.grid(row=0, column=0, sticky="s")
+        self.initiate_trip_title.grid(row=0, column=0, sticky="n")
+        self.initiate_trip_label_passenger_number = ttk.Label(master=self.labels_frame,
+                                                              textvariable=self.initiate_trip_text_var_pass_number,
+                                                              font=("Digital-7", 21))
+        self.initiate_trip_label_passenger_number.grid(row=1, column=0)
+        self.initiate_trip_label_captain = ttk.Label(master=self.labels_frame,
+                                                     textvariable=self.initiate_trip_text_var_captain,
+                                                     font=("Digital-7", 21))
+        self.initiate_trip_label_captain.grid(row=2, column=0)
         self.initiate_trip_label_trip_purpose = ttk.Label(master=self.labels_frame,
-                                             textvariable=self.initiate_trip_text_var_trip_purpose,
-                                             font=("Digital-7", 21))
-        self.initiate_trip_label_trip_purpose.grid(row=1, column=0)
+                                                          textvariable=self.initiate_trip_text_var_trip_purpose,
+                                                          font=("Digital-7", 21))
+        self.initiate_trip_label_trip_purpose.grid(row=3, column=0)
+        self.initiate_trip_label_multiple_dest = ttk.Label(master=self.labels_frame,
+                                                           textvariable=self.initiate_trip_text_var_multiple_dest,
+                                                           font=("Digital-7", 21))
+        self.initiate_trip_label_multiple_dest.grid(row=4, column=0)
         self.yes_no_buttons()
 
     def yes_no_buttons(self):
         self.yes_button = ttk.Button(master=self,
-                                     text="Si",
+                                     text="Continuar →",
                                      style="info.TButton")
 
         self.no_button = ttk.Button(master=self,
-                                    text="No",
+                                    text="← Regresar",
                                     style="info.TButton")
 
-        self.yes_button.grid(row=1, column=1, sticky="nw", padx=50)
+        self.yes_button.grid(row=1, column=1, sticky="nw", padx=50, pady=100)
 
-        self.no_button.grid(row=1, column=0, sticky="ne", padx=50)
+        self.no_button.grid(row=1, column=0, sticky="ne", padx=50, pady=100)
 
     def set_initiate_trip_text_var(self):
-        string_pass = f"Está seguro que quiere iniciar el viaje con {self.passenger_number_var.get()} pasajeros?"
+        string_pass = f"Pasajeros: {self.passenger_number_var.get()}"
         self.initiate_trip_text_var_pass_number.set(string_pass)
-        string_trip_purpose = f"Y motivo de viaje: {self.trip_purposes_var.get()}?"
+        string_captain = f"Capitán: {self.captains_var.get()}"
+        self.initiate_trip_text_var_captain.set(string_captain)
+        string_trip_purpose = f"Motivo: {self.trip_purposes_var.get()}"
         self.initiate_trip_text_var_trip_purpose.set(string_trip_purpose)
+        string_multiple_dest = f"Destino Multiple: {'Si' if self.multi_leg_trip_var else 'No'}"
+        self.initiate_trip_text_var_multiple_dest.set(string_multiple_dest)
 
 
 class FinishTripFrame(ttk.Frame):
