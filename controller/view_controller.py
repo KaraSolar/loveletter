@@ -51,9 +51,8 @@ class ViewController:
         )
 
     def change_initiate_trip_frame(self):
-        if self.view.trip_purpose_validator():
-            self.view.initiate_trip_frame.set_initiate_trip_text_var()
-            self.view.raise_frame("initiate_trip_frame")
+        self.view.initiate_trip_frame.set_initiate_trip_text_var()
+        self.view.raise_frame("initiate_trip_frame")
 
     def configure_initiate_trip_frame_buttons(self):
         self.view.initiate_trip_frame.no_button.config(

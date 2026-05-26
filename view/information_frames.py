@@ -1,5 +1,6 @@
 import ttkbootstrap as ttk
-
+import signal
+import os
 
 class InitiateTripFrame(ttk.Frame):
     def __init__(self, master: ttk.Window, passenger_number_var: ttk.IntVar, trip_purposes_var: ttk.StringVar,
@@ -68,7 +69,7 @@ class InitiateTripFrame(ttk.Frame):
         self.initiate_trip_text_var_captain.set(string_captain)
         string_trip_purpose = f"Motivo: {self.trip_purposes_var.get()}"
         self.initiate_trip_text_var_trip_purpose.set(string_trip_purpose)
-        string_multiple_dest = f"Destino Multiple: {'Si' if self.multi_leg_trip_var else 'No'}"
+        string_multiple_dest = f"Destino Multiple: {'Si' if self.multi_leg_trip_var.get() == True else 'No'}"
         self.initiate_trip_text_var_multiple_dest.set(string_multiple_dest)
 
 
@@ -103,15 +104,25 @@ class TripPurposeWarning(ttk.Frame):
         self.trip_purposes_var = trip_purposes_var
         self.warning_text_var = ttk.StringVar()
         self.columnconfigure((0, 1), weight=1, uniform="a")
-        self.rowconfigure((0, 1), weight=1, uniform="a")
+        self.rowconfigure((0, 1, 2), weight=1, uniform="a")
         self.trip_purpose_warning_label = ttk.Label(master=self,
                                                     textvariable=self.warning_text_var,
                                                     font=("Digital-7", 21))
         self.trip_purpose_warning_label.grid(row=0, column=0, columnspan=2)
+        self.trip_purpose_warning_label_two = ttk.Label(master=self,
+                                                    text="Por favor, seleccione uno.",
+                                                    font=("Digital-7", 21))
+        self.trip_purpose_warning_label_two.grid(row=1, column=0, columnspan=2)
         self.close_warning_button = ttk.Button(master=self,
                                                text="Cerrar",
                                                style="info.TButton")
-        self.close_warning_button.grid(row=1, column=0, columnspan=2)
+        self.close_warning_button.grid(row=2, column=0, columnspan=2)
 
-    def set_warning_text_var(self):
-        self.warning_text_var.set(f"El motivo de viaje: {self.trip_purposes_var.get()} no es válido.")
+    def set_warning_text_var(self, frame):
+        if frame == "multi_leg_trip_frame":
+            self.warning_text_var.set(f"Motivo de viaje no válido")
+        elif frame == "trip_purposes_frame":
+            self.warning_text_var.set(f"Capitán no válido.")
+        else:
+            print("Algo salio mal, abortando...")
+            os.kill(os.getpid(), signal.SIGINT)

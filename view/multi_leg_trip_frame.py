@@ -30,14 +30,14 @@ class MultiLegTrip(ttk.Frame):
 
         # _____________Passenger Number Buttons____________
 
-        self.not_multileg_trip_button: ttk.Button = ttk.Button(master=self.center_dynamic_frame,
+        self.no_multileg_trip_button: ttk.Button = ttk.Button(master=self.center_dynamic_frame,
                                                                 text="Si",
                                                                 style="info.TButton",
                                                                 padding=(10, 20),
                                                                 width=6,
                                                                 command=lambda:self.multi_leg_trip_var.set(False)
                                                                 )
-        self.not_multileg_trip_button.grid(row=0, column=0, sticky="ew", padx=50)
+        self.no_multileg_trip_button.grid(row=0, column=0, sticky="ew", padx=50)
 
         self.yes_multileg_trip_button: ttk.Button = ttk.Button(master=self.center_dynamic_frame,
                                                                 style="info.TButton",

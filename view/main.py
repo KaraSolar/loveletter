@@ -25,7 +25,7 @@ class View():
         self.trip_purpose_warning_frame = TripPurposeWarning(self.root,
                                                              trip_purposes_var=self.trip_purposes_frame.trip_purpose_var)
         self.trip_purpose_warning_frame.close_warning_button.config(
-            command=lambda:self.raise_frame(frame="passenger_input_frame"))
+            command=lambda:self.close_trip_purpose_warning_frame())
         self.finish_trip_frame = FinishTripFrame(self.root)
         self.data_display_frame = DataDisplayFrame(self.root)
         self.multi_leg_trip_frame = MultiLegTrip(self.root, self.root.indicator_font)
@@ -47,18 +47,37 @@ class View():
         self.raise_frame("data_display_frame")
 
     def raise_frame(self, frame):
-        self.frames[frame].lift()
+        if self.trip_input_validator(frame):
+            self.frames[frame].lift()
 
     def start_mainloop(self):
         self.root.mainloop()
 
-    def trip_purpose_validator(self) -> bool:
+    def trip_input_validator(self, validation_frame: str) -> bool:
+        # doesn't make sense anymore, needs to be generic
+        # needs to be called b4 any frame continue.
         '''Validates if the selected trip purpose is in the configured list.
         :return: bool: True if purpose is valid, False otherwise
         '''
-        if self.trip_purposes_frame.trip_purpose_var.get() in self.trip_purposes_config \
-                and self.captain_information_frame.captains_var.get() in self.captain_config:
+        if validation_frame == "multi_leg_trip_frame":
+            if self.trip_purposes_frame.trip_purpose_var.get() in self.trip_purposes_config:
+                return True
+            print("wrong trip purpose")
+            self.trip_purpose_warning_frame.set_warning_text_var(validation_frame)
+            self.raise_frame(frame="trip_purpose_warning")
+        elif validation_frame == "trip_purposes_frame":
+            if self.captain_information_frame.captains_var.get() in self.captain_config:
+                return True
+            print("wrong captain info")
+            self.trip_purpose_warning_frame.set_warning_text_var(validation_frame)
+            self.raise_frame(frame="trip_purpose_warning")
+        else:
             return True
-        self.trip_purpose_warning_frame.set_warning_text_var()
-        self.raise_frame(frame="trip_purpose_warning")
-        return False
+
+    def close_trip_purpose_warning_frame(self):
+        if not self.captain_information_frame.captains_var.get():
+            self.raise_frame(frame="captain_information_frame")
+        elif not self.trip_purposes_frame.trip_purpose_var.get():
+            self.raise_frame(frame="trip_purposes_frame")
+        else:
+            self.raise_frame(frame="passenger_input_frame")
