@@ -54,7 +54,11 @@ class View():
         self.initiate_trip_frame = InitiateTripFrame(self.root, self.passenger_input_frame.passenger_number_var,
                                                      self.trip_purposes_frame.trip_purpose_var,
                                                      self.captain_information_frame.captains_var,
-                                                     self.multi_leg_trip_frame.multi_leg_trip_var)
+                                                     self.multi_leg_trip_frame.multi_leg_trip_var,
+                                                     self.departure_community_frame.community_var,
+                                                     self.departure_port_frame.port_var,
+                                                     self.arrival_community_frame.community_var,
+                                                     self.arrival_port_frame.port_var)
         self.frames["data_display_frame"] = self.data_display_frame
         self.frames["finish_trip_frame"] = self.finish_trip_frame
         self.frames["trip_purpose_warning"] = self.trip_purpose_warning_frame
