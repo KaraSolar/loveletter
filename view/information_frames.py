@@ -8,7 +8,6 @@ class InitiateTripFrame(ttk.Frame):
                  dep_community_var: ttk.StringVar, dep_port_var: ttk.StringVar,
                  arr_community_var: ttk.StringVar, arr_port_var: ttk.StringVar):
         super().__init__(master)
-        # Class args
         self.passenger_number_var = passenger_number_var
         self.trip_purposes_var = trip_purposes_var
         self.captains_var = captains_var
@@ -18,14 +17,11 @@ class InitiateTripFrame(ttk.Frame):
         self.arr_community_var = arr_community_var
         self.arr_port_var = arr_port_var
 
-        # class frame configuration
-        self.columnconfigure((0, 1), weight=1, uniform="a")
-        self.rowconfigure((0, 1), weight=1, uniform="a")
-        self.labels_frame = ttk.Frame(self)
-        self.labels_frame.columnconfigure(0, weight=1, uniform="a")
-        self.labels_frame.rowconfigure((0, 1, 2, 3, 4, 5, 6), weight=1, uniform="a")
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)   # Title row
+        self.rowconfigure(1, weight=6)   # Labels row
+        self.rowconfigure(2, weight=1)   # Navigation row
 
-        # displaying vars
         self.initiate_trip_text_var_pass_number = ttk.StringVar()
         self.initiate_trip_text_var_trip_purpose = ttk.StringVar()
         self.initiate_trip_text_var_captain = ttk.StringVar()
@@ -33,52 +29,69 @@ class InitiateTripFrame(ttk.Frame):
         self.initiate_trip_text_var_departure = ttk.StringVar()
         self.initiate_trip_text_var_arrival = ttk.StringVar()
 
+        self._build_title_frame()
+        self._build_labels_frame()
+        self._build_navigation_frame()
 
-        # Frame packing
-        self.labels_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
-        self.initiate_trip_title = ttk.Label(master=self.labels_frame,
-                                             text="Iniciar viaje con:",
-                                             font=("Digital-7", 21))
-        self.initiate_trip_title.grid(row=0, column=0, sticky="n")
-        self.initiate_trip_label_passenger_number = ttk.Label(master=self.labels_frame,
-                                                              textvariable=self.initiate_trip_text_var_pass_number,
-                                                              font=("Digital-7", 21))
-        self.initiate_trip_label_passenger_number.grid(row=1, column=0)
-        self.initiate_trip_label_captain = ttk.Label(master=self.labels_frame,
-                                                     textvariable=self.initiate_trip_text_var_captain,
-                                                     font=("Digital-7", 21))
-        self.initiate_trip_label_captain.grid(row=2, column=0)
-        self.initiate_trip_label_trip_purpose = ttk.Label(master=self.labels_frame,
-                                                          textvariable=self.initiate_trip_text_var_trip_purpose,
-                                                          font=("Digital-7", 21))
-        self.initiate_trip_label_trip_purpose.grid(row=3, column=0)
-        self.initiate_trip_label_multiple_dest = ttk.Label(master=self.labels_frame,
-                                                           textvariable=self.initiate_trip_text_var_multiple_dest,
-                                                           font=("Digital-7", 21))
-        self.initiate_trip_label_multiple_dest.grid(row=4, column=0)
-        self.initiate_trip_label_departure = ttk.Label(master=self.labels_frame,
-                                                           textvariable=self.initiate_trip_text_var_departure,
-                                                           font=("Digital-7", 21))
-        self.initiate_trip_label_departure.grid(row=5, column=0)
-        self.initiate_trip_label_arrival = ttk.Label(master=self.labels_frame,
-                                                           textvariable=self.initiate_trip_text_var_arrival,
-                                                           font=("Digital-7", 21))
-        self.initiate_trip_label_arrival.grid(row=6, column=0)
+    def _build_title_frame(self) -> None:
+        title_frame = ttk.Frame(self, padding=(10, 8))
+        title_frame.grid(row=0, column=0, sticky="nsew")
+        title_frame.columnconfigure(0, weight=1)
+        ttk.Label(
+            title_frame,
+            text="Iniciar viaje con:",
+            font=("Digital-7", 21),
+            anchor="center",
+        ).grid(row=0, column=0, sticky="ew")
 
-        self.yes_no_buttons()
+    def _build_labels_frame(self) -> None:
+        labels_frame = ttk.Frame(self)
+        labels_frame.grid(row=1, column=0, sticky="nsew")
+        labels_frame.columnconfigure(0, weight=1)
+        for r in range(6):
+            labels_frame.rowconfigure(r, weight=1)
 
-    def yes_no_buttons(self):
-        self.yes_button = ttk.Button(master=self,
-                                     text="Continuar →",
-                                     style="info.TButton")
+        label_vars = [
+            self.initiate_trip_text_var_pass_number,
+            self.initiate_trip_text_var_captain,
+            self.initiate_trip_text_var_trip_purpose,
+            self.initiate_trip_text_var_multiple_dest,
+            self.initiate_trip_text_var_departure,
+            self.initiate_trip_text_var_arrival,
+        ]
+        for i, var in enumerate(label_vars):
+            ttk.Label(
+                labels_frame,
+                textvariable=var,
+                font=("Digital-7", 21),
+                anchor="center",
+            ).grid(row=i, column=0, sticky="ew")
 
-        self.no_button = ttk.Button(master=self,
-                                    text="← Regresar",
-                                    style="info.TButton")
+    def _build_navigation_frame(self) -> None:
+        nav_frame = ttk.Frame(self, padding=(12, 8))
+        nav_frame.grid(row=2, column=0, sticky="nsew")
+        nav_frame.columnconfigure(0, weight=1)
+        nav_frame.columnconfigure(1, weight=0)
+        nav_frame.columnconfigure(2, weight=1)
+        nav_frame.rowconfigure(0, weight=1)
 
-        self.yes_button.grid(row=1, column=1, sticky="nw", padx=50, pady=100)
+        self.no_button = ttk.Button(
+            master=nav_frame,
+            text="← Regresar",
+            style="info.Outline.TButton",
+            width=16,
+        )
+        self.no_button.grid(row=0, column=0, sticky="e", padx=(0, 10))
 
-        self.no_button.grid(row=1, column=0, sticky="ne", padx=50, pady=100)
+        ttk.Label(nav_frame, text="", width=4).grid(row=0, column=1)
+
+        self.yes_button = ttk.Button(
+            master=nav_frame,
+            text="Continuar →",
+            style="info.TButton",
+            width=16,
+        )
+        self.yes_button.grid(row=0, column=2, sticky="w", padx=(10, 0))
 
     def set_initiate_trip_text_var(self):
         string_pass = f"Pasajeros: {self.passenger_number_var.get()}"
@@ -97,26 +110,65 @@ class InitiateTripFrame(ttk.Frame):
 class FinishTripFrame(ttk.Frame):
     def __init__(self, master: ttk.Window):
         super().__init__(master)
-        self.columnconfigure((0, 1), weight=1, uniform="a")
-        self.rowconfigure((0, 1), weight=1, uniform="a")
-        self.end_trip_label = ttk.Label(master=self,
-                                        text="Está seguro que quiere terminar el viaje?",
-                                        font=("Digital-7", 22))
-        self.end_trip_label.grid(row=0, column=0, columnspan=2)
-        self.yes_no_buttons()
 
-    def yes_no_buttons(self):
-        self.yes_button = ttk.Button(master=self,
-                                     text="Si",
-                                     style="info.TButton")
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)   # Title row
+        self.rowconfigure(1, weight=6)   # Content row
+        self.rowconfigure(2, weight=1)   # Navigation row
 
-        self.no_button = ttk.Button(master=self,
-                                    text="No",
-                                    style="info.TButton")
+        self._build_title_frame()
+        self._build_content_frame()
+        self._build_navigation_frame()
 
-        self.yes_button.grid(row=1, column=1, sticky="nw", padx=50)
+    def _build_title_frame(self) -> None:
+        title_frame = ttk.Frame(self, padding=(10, 8))
+        title_frame.grid(row=0, column=0, sticky="nsew")
+        title_frame.columnconfigure(0, weight=1)
+        ttk.Label(
+            title_frame,
+            text="Terminar Viaje",
+            font=("Digital-7", 22),
+            anchor="center",
+        ).grid(row=0, column=0, sticky="ew")
 
-        self.no_button.grid(row=1, column=0, sticky="ne", padx=50)
+    def _build_content_frame(self) -> None:
+        content_frame = ttk.Frame(self)
+        content_frame.grid(row=1, column=0, sticky="nsew")
+        content_frame.columnconfigure(0, weight=1)
+        content_frame.rowconfigure(0, weight=1)
+        ttk.Label(
+            content_frame,
+            text="Está seguro que quiere terminar el viaje?",
+            font=("Digital-7", 22),
+            anchor="center",
+            wraplength=400,
+        ).grid(row=0, column=0, sticky="ew")
+
+    def _build_navigation_frame(self) -> None:
+        nav_frame = ttk.Frame(self, padding=(12, 8))
+        nav_frame.grid(row=2, column=0, sticky="nsew")
+        nav_frame.columnconfigure(0, weight=1)
+        nav_frame.columnconfigure(1, weight=0)
+        nav_frame.columnconfigure(2, weight=1)
+        nav_frame.rowconfigure(0, weight=1)
+
+        self.no_button = ttk.Button(
+            master=nav_frame,
+            text="← Regresar",
+            style="info.Outline.TButton",
+            width=16,
+        )
+        self.no_button.grid(row=0, column=0, sticky="e", padx=(0, 10))
+
+        ttk.Label(nav_frame, text="", width=4).grid(row=0, column=1)
+
+        self.yes_button = ttk.Button(
+            master=nav_frame,
+            text="Si →",
+            style="info.TButton",
+            width=16,
+        )
+        self.yes_button.grid(row=0, column=2, sticky="w", padx=(10, 0))
 
 
 class TripPurposeWarning(ttk.Frame):

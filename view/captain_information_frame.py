@@ -32,7 +32,7 @@ class CaptainInformation(ttk.Frame):
 
     # _________________ Row 0 — Title _____________________________
     def _build_title_frame(self) -> None:
-        title_frame = ttk.Frame(self)
+        title_frame = ttk.Frame(self, padding=(10, 8))
         title_frame.grid(row=0, column=0, sticky="nsew")
         title_frame.columnconfigure(0, weight=1)
 
