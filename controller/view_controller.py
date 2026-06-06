@@ -127,6 +127,8 @@ class ViewController:
                                       "sighting_count": sighting_count}
                                   }
                                  )
+        self.view.biodiversity_frame.refresh()
+        self.view.biodiversity_input_frame.refresh()
 
     def initiate_trip_listener(self):
         trip_passenger_qty = self.view.passenger_input_frame.passenger_number_var.get()
@@ -158,6 +160,17 @@ class ViewController:
         self.data_base_queue.put({"type":"end_trip"})
         self.trip_start_signal_event.clear()
         self.view.raise_frame("data_display_frame")
+        self._refresh_trip_frames()
+
+    def _refresh_trip_frames(self):
+        self.view.passenger_input_frame.refresh()
+        self.view.captain_information_frame.refresh()
+        self.view.trip_purposes_frame.refresh()
+        self.view.multi_leg_trip_frame.refresh()
+        self.view.departure_community_frame.refresh()
+        self.view.departure_port_frame.refresh()
+        self.view.arrival_community_frame.refresh()
+        self.view.arrival_port_frame.refresh()
 
     def update_view(self, telemetry: dict) -> None:
         # Update Course

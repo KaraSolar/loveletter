@@ -98,6 +98,11 @@ class BiodiversityInformation(ttk.Frame):
         self.register_button.grid(row=0, column=2, sticky="w", padx=(10, 0))
 
     # _________________ Logic _____________________________________
+    def refresh(self) -> None:
+        self.biodiversity_var.set("")
+        for btn in self.buttons.values():
+            btn.configure(style="secondary.TButton")
+
     def select(self, opt: str) -> None:
         self.biodiversity_var.set(opt)
         self._update_selection()

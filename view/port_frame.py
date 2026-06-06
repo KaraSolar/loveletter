@@ -19,6 +19,7 @@ class PortFrame(ttk.Frame):
         self.title = title
         self.port_var: ttk.StringVar = ttk.StringVar(value="")
         self.buttons = {}
+        self._last_built_community: str = None
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)   # Title row
@@ -47,12 +48,15 @@ class PortFrame(ttk.Frame):
 
     # _________________ Row 1 — Port Buttons (dynamic) ____________
     def refresh(self) -> None:
+        current_community = self.community_var.get()
+        if current_community == self._last_built_community:
+            return
         for widget in self.center_dynamic_frame.winfo_children():
             widget.destroy()
         self.buttons.clear()
         self.port_var.set("")
-
-        ports = self.communities_config.get(self.community_var.get(), [])
+        self._last_built_community = current_community
+        ports = self.communities_config.get(current_community, [])
         self._build_buttons_frame(ports)
 
     def _build_buttons_frame(self, ports: list) -> None:

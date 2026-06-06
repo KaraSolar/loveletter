@@ -107,6 +107,11 @@ class CaptainInformation(ttk.Frame):
         self.continue_button.grid(row=0, column=2, sticky="w", padx=(10, 0))
 
     # _________________ Logic _____________________________________
+    def refresh(self) -> None:
+        self.captains_var.set("")
+        for btn in self.buttons.values():
+            btn.configure(style="secondary.TButton")
+
     def select(self, opt: str) -> None:
         self.captains_var.set(opt)
         self._update_selection()

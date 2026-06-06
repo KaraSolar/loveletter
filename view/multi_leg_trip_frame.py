@@ -89,6 +89,10 @@ class MultiLegTrip(ttk.Frame):
         self.continue_button.grid(row=0, column=2, sticky="w", padx=(10, 0))
 
     # _________________ Logic _____________________________________
+    def refresh(self) -> None:
+        self.multi_leg_trip_var.set(False)
+        self._update_selection()
+
     def select(self, value: bool) -> None:
         self.multi_leg_trip_var.set(value)
         self._update_selection()

@@ -56,6 +56,9 @@ class PassengerInput(ttk.Frame):
 
 
     # ________________command methods_____________________
+    def refresh(self) -> None:
+        self.passenger_number_var.set(self.min_passenger)
+
     def decrease_passenger_number(self) -> None:
         n: int = self.passenger_number_var.get()
         if n > self.min_passenger:
