@@ -111,7 +111,6 @@ class TripPurposes(ttk.Frame):
     def select(self, opt: str) -> None:
         self.trip_purpose_var.set(opt)
         self._update_selection()
-        print(self.trip_purpose_var.get())
 
     def _update_selection(self) -> None:
         current = self.trip_purpose_var.get()

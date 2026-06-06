@@ -110,7 +110,6 @@ class CaptainInformation(ttk.Frame):
     def select(self, opt: str) -> None:
         self.captains_var.set(opt)
         self._update_selection()
-        print(self.captains_var.get())
 
     def _update_selection(self) -> None:
         current = self.captains_var.get()
