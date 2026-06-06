@@ -131,10 +131,10 @@ class View():
         elif not self.departure_community_frame.community_var.get():
             self.raise_frame(frame="departure_community_frame")
         elif not self.departure_port_frame.port_var.get():
-            self.raise_frame(frame="departure_community_frame")
+            self.raise_frame(frame="departure_port_frame")
         elif not self.arrival_community_frame.community_var.get():
             self.raise_frame(frame="arrival_community_frame")
         elif not self.arrival_port_frame.port_var.get():
-            self.raise_frame(frame="arrival_community_frame")
+            self.raise_frame(frame="arrival_port_frame")
         else:
             self.raise_frame(frame="passenger_input_frame")
