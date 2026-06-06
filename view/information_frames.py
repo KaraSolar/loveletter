@@ -152,6 +152,8 @@ class TripPurposeWarning(ttk.Frame):
             self.warning_text_var.set("Selecciona una comunidad de llegada.")
         elif frame == "initiate_trip_frame":
             self.warning_text_var.set("Selecciona un puerto o finca de llegada.")
+        elif frame == "biodiversity_input_frame":
+            self.warning_text_var.set("Selecciona una especie primero.")
         else:
             print("Algo salio mal, abortando...")
             os.kill(os.getpid(), signal.SIGINT)

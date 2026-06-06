@@ -129,6 +129,11 @@ class View():
                 return True
             self.trip_purpose_warning_frame.set_warning_text_var(validation_frame)
             self.raise_frame(frame="trip_purpose_warning")
+        elif validation_frame == "biodiversity_input_frame":
+            if self.biodiversity_frame.biodiversity_var.get() in self.biodiversity_config:
+                return True
+            self.trip_purpose_warning_frame.set_warning_text_var(validation_frame)
+            self.raise_frame(frame="trip_purpose_warning")
         else:
             return True
 
@@ -145,5 +150,7 @@ class View():
             self.raise_frame(frame="arrival_community_frame")
         elif not self.arrival_port_frame.port_var.get():
             self.raise_frame(frame="arrival_port_frame")
+        elif not self.biodiversity_frame.biodiversity_var.get():
+            self.raise_frame(frame="biodiversity_frame")
         else:
             self.raise_frame(frame="passenger_input_frame")
