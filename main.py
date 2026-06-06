@@ -22,7 +22,9 @@ if __name__ == "__main__":
     controller = Controller(view=view, db_name=f"model/{db_name_config}",
                             server_ip_config=server_ip_config,
                             passenger_number_config=passenger_number_config,
-                            trip_purposes_config=trip_purposes_config)
+                            trip_purposes_config=trip_purposes_config,
+                            captain_config=list_captain_config,
+                            communities_config=communities_config)
     try:
         view.start_mainloop()
     except KeyboardInterrupt:

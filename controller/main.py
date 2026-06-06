@@ -12,11 +12,14 @@ from .workers import WorkerDatabase, WorkerModbus
 
 
 class Controller:
-    def __init__(self, view, db_name, server_ip_config, passenger_number_config: dict, trip_purposes_config:list):
+    def __init__(self, view, db_name, server_ip_config, passenger_number_config: dict, trip_purposes_config: list,
+                 captain_config: list, communities_config: dict):
         self.view = view
         self.db_name = db_name
         self.passenger_number_config: dict = passenger_number_config
         self.trip_purposes_config = trip_purposes_config
+        self.captain_config = captain_config
+        self.communities_config = communities_config
         self.server_ip_config = server_ip_config
         self.view.root.bind("<<update_view>>", self.update_view)
         self.stop_workers_signal = threading.Event()
@@ -35,7 +38,9 @@ class Controller:
         self.worker_database = WorkerDatabase(queue_worker_database=self.queue_worker_database,
                                               db_name=self.db_name,
                                               passenger_number_config=self.passenger_number_config,
-                                              trip_purposes_config=self.trip_purposes_config)
+                                              trip_purposes_config=self.trip_purposes_config,
+                                              captain_config=self.captain_config,
+                                              communities_config=self.communities_config)
         self.worker_database.start()
 
     def closing_keys(self):

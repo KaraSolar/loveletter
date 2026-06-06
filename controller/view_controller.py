@@ -1,6 +1,7 @@
 import queue
 import threading
 
+
 # La idea es:
 # 1. Iniciar Viaje ve a
 
@@ -101,15 +102,31 @@ class ViewController:
     def initiate_trip_listener(self):
         trip_passenger_qty = self.view.passenger_input_frame.passenger_number_var.get()
         trip_purpose = self.view.trip_purposes_frame.trip_purpose_var.get()
+        captain = self.view.captain_information_frame.captains_var.get()
+        multi_leg_trip = self.view.multi_leg_trip_frame.multi_leg_trip_var.get()
+        departure_community = self.view.departure_community_frame.community_var.get()
+        departure_port = self.view.departure_port_frame.port_var.get()
+        arrival_community = self.view.arrival_community_frame.community_var.get()
+        arrival_port = self.view.arrival_port_frame.port_var.get()
         self.view.data_display_frame.show_trip_mode()
         self.view.raise_frame("data_display_frame")
-        self.data_base_queue.put({"type":"trip", "value":{"passenger_number":trip_passenger_qty,
-                                                          "trip_purpose":trip_purpose}})
+        self.data_base_queue.put({"type": "trip",
+                                  "value": {
+                                      "passenger_number": trip_passenger_qty,
+                                      "trip_purpose": trip_purpose,
+                                      "captain": captain,
+                                      "multi_leg_trip": multi_leg_trip,
+                                      "departure_community": departure_community,
+                                      "departure_port": departure_port,
+                                      "arrival_community": arrival_community,
+                                      "arrival_port": arrival_port}
+                                  }
+                                 )
         self.trip_start_signal_event.set()
 
     def end_trip_listener(self):
         self.view.data_display_frame.show_dock_mode()
-        self.data_base_queue.put({"type": "end_trip"})
+        self.data_base_queue.put({"type":"end_trip"})
         self.trip_start_signal_event.clear()
         self.view.raise_frame("data_display_frame")
 

@@ -62,7 +62,8 @@ class TelemetryDatabase:
     transaction nor closes the connection.
     """
     def __init__(self, db_name: str,
-                 passenger_number_config: dict, trip_purposes_config: list):
+                 passenger_number_config: dict, trip_purposes_config: list,
+                 captain_config: list, communities_config: dict):
         """
         Instantiate the connection to the database and create the tables.
         :param db_name: str expects a string constraint to "model/telemetry.db",
@@ -71,6 +72,8 @@ class TelemetryDatabase:
         self.db_name = db_name
         self.passenger_number_config = passenger_number_config
         self.trip_purposes_config = trip_purposes_config
+        self.captain_config = captain_config
+        self.communities_config = communities_config
         self.__conn, self.__cursor = self.connect_to_database(self.db_name)
         self.create_tables()
         self.__trip_id = None
@@ -118,9 +121,15 @@ class TelemetryDatabase:
         """
         try:
             self.__cursor.execute('''CREATE TABLE IF NOT EXISTS Trip (
-                                tripId           INTEGER PRIMARY KEY AUTOINCREMENT,
-                                tripPassengerQty INTEGER NOT NULL,
-                                tripPurpose      TEXT    NOT NULL
+                                tripId            INTEGER PRIMARY KEY AUTOINCREMENT,
+                                tripPassengerQty  INTEGER NOT NULL,
+                                tripPurpose       TEXT    NOT NULL,
+                                tripCaptain       TEXT    NOT NULL,
+                                tripMultiLeg      TEXT    NOT NULL,
+                                tripDepComm       TEXT    NOT NULL,
+                                tripDepPort       TEXT    NOT NULL,
+                                tripArrComm       TEXT    NOT NULL,
+                                tripArrPort       TEXT    NOT NULL
                                 );
                                 ''')
 
@@ -152,7 +161,9 @@ class TelemetryDatabase:
         else:
             self.__conn.commit()
 
-    def trip_insert_values_validation(self, trip_passenger_qty, trip_purpose):
+    def trip_insert_values_validation(self, trip_passenger_qty, trip_purpose,
+                                      captain, multi_leg_trip, departure_community,
+                                      departure_port, arrival_community, arrival_port):
         """
         Validates fields for trip insertion.
         :param trip_passenger_qty: dict greater than 0 but lower than config file, required.
@@ -169,23 +180,40 @@ class TelemetryDatabase:
             raise ValueError("passengers not in range")
         if trip_purpose not in self.trip_purposes_config:
             raise ValueError("trip purpose not correct")
+        if captain not in self.captain_config:
+            raise ValueError("captain not correct")
+        if departure_community not in self.communities_config:
+            raise ValueError("departure community not correct")
+        if arrival_community not in self.communities_config:
+            raise ValueError("arrival community not correct")
 
     def insert_trip(self, value: dict) -> None:
         """
         Inserts a new trip row to the Trip table with the number of passengers given.
         When successful assigns the attribute trip_id to the trip id.
-        :param value: dict that contains passenger quantity and the trip purpose.
+        :param value: dict that contains passenger quantity, trip purpose, captain, multi_leg_trip,
+            arrival/departure community and port.
         :param value: dict
         :return: None
         :raises: ValueError if passenger None, less than or higher than config file.
         :raises: sqlite3.Error if database error.
         """
-        trip_passenger_qty, trip_purpose = value.values()
-        self.trip_insert_values_validation(trip_passenger_qty=trip_passenger_qty, trip_purpose=trip_purpose)
+        trip_passenger_qty, trip_purpose, captain, multi_leg_trip, departure_community, \
+            departure_port, arrival_community, arrival_port = value.values()
+        multi_leg_trip = str(multi_leg_trip)
+        self.trip_insert_values_validation(trip_passenger_qty=trip_passenger_qty, trip_purpose=trip_purpose,
+                                           captain=captain, multi_leg_trip=multi_leg_trip,
+                                           departure_community=departure_community,
+                                           departure_port=departure_port, arrival_community=arrival_community,
+                                           arrival_port=arrival_port
+                                           )
         try:
             self.__cursor.execute('''
-                INSERT INTO Trip(tripPassengerQty, tripPurpose) VALUES(?,?)
-            ''', (trip_passenger_qty, trip_purpose))
+                INSERT INTO Trip(tripPassengerQty, tripPurpose, tripCaptain, tripMultiLeg,
+                                tripDepComm, tripDepPort, tripArrComm, tripArrPort)
+                                VALUES(?,?,?,?,?,?,?,?)
+            ''', (trip_passenger_qty, trip_purpose, captain, multi_leg_trip,
+                  departure_community, departure_port, arrival_community, arrival_port))
             row = self.__cursor.lastrowid
         except sqlite3.Error as exc:
             self.close_connection()
