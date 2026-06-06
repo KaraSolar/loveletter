@@ -28,7 +28,9 @@ if __name__ == "__main__":
                             passenger_number_config=passenger_number_config,
                             trip_purposes_config=trip_purposes_config,
                             captain_config=list_captain_config,
-                            communities_config=communities_config)
+                            communities_config=communities_config,
+                            biodiversity_config=biodiversity_config,
+                            biodiversity_number_config=biodiversity_number_config)
     try:
         view.start_mainloop()
     except KeyboardInterrupt:

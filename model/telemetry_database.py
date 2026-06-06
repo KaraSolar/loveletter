@@ -63,7 +63,8 @@ class TelemetryDatabase:
     """
     def __init__(self, db_name: str,
                  passenger_number_config: dict, trip_purposes_config: list,
-                 captain_config: list, communities_config: dict):
+                 captain_config: list, communities_config: dict,
+                 biodiversity_config: list, biodiversity_number_config: dict):
         """
         Instantiate the connection to the database and create the tables.
         :param db_name: str expects a string constraint to "model/telemetry.db",
@@ -74,6 +75,8 @@ class TelemetryDatabase:
         self.trip_purposes_config = trip_purposes_config
         self.captain_config = captain_config
         self.communities_config = communities_config
+        self.biodiversity_config = biodiversity_config
+        self.biodiversity_number_config = biodiversity_number_config
         self.__conn, self.__cursor = self.connect_to_database(self.db_name)
         self.create_tables()
         self.__trip_id = None
@@ -153,6 +156,8 @@ class TelemetryDatabase:
                                     telemetryGPSNumberOfSatellites      INTEGER,
                                     telemetryAltitude1                  INTEGER,
                                     telemetryAltitude2                  INTEGER,
+                                    Biodiversity                        TEXT,
+                                    SightingCount                       INTEGER,
                                     FOREIGN KEY (tripId) REFERENCES Trip (tripId)
                                 );''')
         except sqlite3.Error as exc:
@@ -258,6 +263,47 @@ class TelemetryDatabase:
                   telemetry["longitude2"], telemetry["course"], telemetry["speed"],
                   telemetry["gps_fix"], telemetry["gps_number_of_satellites"],
                   telemetry["altitude1"], telemetry["altitude2"]))
+        except sqlite3.Error as exe:
+            self.close_connection()
+            raise sqlite3.Error from exe
+        else:
+            self.__conn.commit()
+
+    def insert_biodiversity_validation(self, biodiversity, sighting_count):
+        """
+        Validates fields for trip insertion.
+        :param sighting_count: dict greater than 1 but lower than config file, required.
+        :param biodiversity: str must be one of the values defined in config.yml
+        :return: None
+        :raises: ValueError if passenger None, less than or higher than config file.
+        """
+        if sighting_count is None:
+            raise ValueError("sighting can't be NULL")
+        if not isinstance(sighting_count, int):
+            raise ValueError("sighting must be int.")
+        if (sighting_count > self.biodiversity_number_config["max"]
+                or sighting_count < self.biodiversity_number_config["min"]):
+            raise ValueError("sighting not in range")
+        if biodiversity not in self.biodiversity_config:
+            raise ValueError("biodiversity not correct")
+
+    def insert_biodiversity(self, biodiversity_info: dict) -> None:
+        """
+        Insert the biodiversity data into the database. the biodiversity must be in the appropriate format
+        :param biodiversity_info: the biodiversity dictionary containing animal and sighting count.
+        :return: None
+        """
+        self.__timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        biodiversity, sighting_count = biodiversity_info.values()
+        self.insert_biodiversity_validation(biodiversity, sighting_count)
+        try:
+            self.__cursor.execute('''
+                INSERT INTO TelemetryData (telemetryTimeStamp,
+                                            tripId,
+                                            Biodiversity,
+                                            SightingCount ) VALUES(?,?,?,?)
+            ''', (self.__timestamp, self.__trip_id, biodiversity,
+                  sighting_count))
         except sqlite3.Error as exe:
             self.close_connection()
             raise sqlite3.Error from exe

@@ -13,13 +13,16 @@ from .workers import WorkerDatabase, WorkerModbus
 
 class Controller:
     def __init__(self, view, db_name, server_ip_config, passenger_number_config: dict, trip_purposes_config: list,
-                 captain_config: list, communities_config: dict):
+                 captain_config: list, communities_config: dict,
+                 biodiversity_config: list, biodiversity_number_config: dict):
         self.view = view
         self.db_name = db_name
         self.passenger_number_config: dict = passenger_number_config
         self.trip_purposes_config = trip_purposes_config
         self.captain_config = captain_config
         self.communities_config = communities_config
+        self.biodiversity_config = biodiversity_config
+        self.biodiversity_number_config = biodiversity_number_config
         self.server_ip_config = server_ip_config
         self.view.root.bind("<<update_view>>", self.update_view)
         self.stop_workers_signal = threading.Event()
@@ -40,7 +43,9 @@ class Controller:
                                               passenger_number_config=self.passenger_number_config,
                                               trip_purposes_config=self.trip_purposes_config,
                                               captain_config=self.captain_config,
-                                              communities_config=self.communities_config)
+                                              communities_config=self.communities_config,
+                                              biodiversity_config=self.biodiversity_config,
+                                              biodiversity_number_config=self.biodiversity_number_config)
         self.worker_database.start()
 
     def closing_keys(self):

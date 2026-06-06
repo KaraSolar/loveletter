@@ -86,7 +86,7 @@ class ViewController:
             command=lambda:self.view.raise_frame("biodiversity_frame")
         )
         self.view.biodiversity_input_frame.register_button.config(
-            command=lambda:self.view.raise_frame("data_display_frame")
+            command=lambda:self.biodiversity_register()
         )
 
     def _navigate_to_biodiversity_input(self):
@@ -117,6 +117,17 @@ class ViewController:
         self.view.finish_trip_frame.yes_button.config(
             command=self.end_trip_listener)
 
+    def biodiversity_register(self):
+        biodiversity = self.view.biodiversity_frame.biodiversity_var.get()
+        sighting_count = self.view.biodiversity_input_frame.sighting_count_var.get()
+        self.view.raise_frame("data_display_frame")
+        self.data_base_queue.put({"type": "biodiversity",
+                                  "value": {
+                                      "biodiversity": biodiversity,
+                                      "sighting_count": sighting_count}
+                                  }
+                                 )
+
     def initiate_trip_listener(self):
         trip_passenger_qty = self.view.passenger_input_frame.passenger_number_var.get()
         trip_purpose = self.view.trip_purposes_frame.trip_purpose_var.get()
@@ -128,16 +139,16 @@ class ViewController:
         arrival_port = self.view.arrival_port_frame.port_var.get()
         self.view.data_display_frame.show_trip_mode()
         self.view.raise_frame("data_display_frame")
-        self.data_base_queue.put({"type": "trip",
-                                  "value": {
-                                      "passenger_number": trip_passenger_qty,
-                                      "trip_purpose": trip_purpose,
-                                      "captain": captain,
-                                      "multi_leg_trip": multi_leg_trip,
-                                      "departure_community": departure_community,
-                                      "departure_port": departure_port,
-                                      "arrival_community": arrival_community,
-                                      "arrival_port": arrival_port}
+        self.data_base_queue.put({"type":"trip",
+                                  "value":{
+                                      "passenger_number":trip_passenger_qty,
+                                      "trip_purpose":trip_purpose,
+                                      "captain":captain,
+                                      "multi_leg_trip":multi_leg_trip,
+                                      "departure_community":departure_community,
+                                      "departure_port":departure_port,
+                                      "arrival_community":arrival_community,
+                                      "arrival_port":arrival_port}
                                   }
                                  )
         self.trip_start_signal_event.set()
