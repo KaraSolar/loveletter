@@ -120,9 +120,17 @@ class TripPurposeWarning(ttk.Frame):
 
     def set_warning_text_var(self, frame):
         if frame == "multi_leg_trip_frame":
-            self.warning_text_var.set(f"Motivo de viaje no válido")
+            self.warning_text_var.set("Motivo de viaje no válido")
         elif frame == "trip_purposes_frame":
-            self.warning_text_var.set(f"Capitán no válido.")
+            self.warning_text_var.set("Capitán no válido.")
+        elif frame == "departure_port_frame":
+            self.warning_text_var.set("Selecciona una comunidad de salida.")
+        elif frame == "arrival_community_frame":
+            self.warning_text_var.set("Selecciona un puerto o finca de salida.")
+        elif frame == "arrival_port_frame":
+            self.warning_text_var.set("Selecciona una comunidad de llegada.")
+        elif frame == "initiate_trip_frame":
+            self.warning_text_var.set("Selecciona un puerto o finca de llegada.")
         else:
             print("Algo salio mal, abortando...")
             os.kill(os.getpid(), signal.SIGINT)

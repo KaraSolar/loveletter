@@ -33,6 +33,18 @@ class ViewController:
             command=lambda:self.view.raise_frame("multi_leg_trip_frame")
         )
         self.view.multi_leg_trip_frame.continue_button.config(
+            command=lambda:self.view.raise_frame("departure_community_frame")
+        )
+        self.view.departure_community_frame.continue_button.config(
+            command=lambda:self._navigate_to_departure_port()
+        )
+        self.view.departure_port_frame.continue_button.config(
+            command=lambda:self.view.raise_frame("arrival_community_frame")
+        )
+        self.view.arrival_community_frame.continue_button.config(
+            command=lambda:self._navigate_to_arrival_port()
+        )
+        self.view.arrival_port_frame.continue_button.config(
             command=lambda:self.change_initiate_trip_frame()
         )
 
@@ -49,6 +61,26 @@ class ViewController:
         self.view.multi_leg_trip_frame.go_back_button.config(
             command=lambda:self.view.raise_frame("trip_purposes_frame")
         )
+        self.view.departure_community_frame.go_back_button.config(
+            command=lambda:self.view.raise_frame("multi_leg_trip_frame")
+        )
+        self.view.departure_port_frame.go_back_button.config(
+            command=lambda:self.view.raise_frame("departure_community_frame")
+        )
+        self.view.arrival_community_frame.go_back_button.config(
+            command=lambda:self.view.raise_frame("departure_port_frame")
+        )
+        self.view.arrival_port_frame.go_back_button.config(
+            command=lambda:self.view.raise_frame("arrival_community_frame")
+        )
+
+    def _navigate_to_departure_port(self):
+        self.view.departure_port_frame.refresh()
+        self.view.raise_frame("departure_port_frame")
+
+    def _navigate_to_arrival_port(self):
+        self.view.arrival_port_frame.refresh()
+        self.view.raise_frame("arrival_port_frame")
 
     def change_initiate_trip_frame(self):
         self.view.initiate_trip_frame.set_initiate_trip_text_var()

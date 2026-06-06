@@ -12,12 +12,13 @@ if db_name_config == "telemetry.db":
     db_name_config = datetime.now().strftime("%Y_%m_%d_") + db_name_config
 server_ip_config = config["cerbo_gx"]["server_ip"]
 passenger_number_config: dict = config["passenger_number"]
+communities_config: dict = config["communities_config"]
 
 
 if __name__ == "__main__":
     # TODO: create the logging hierarchy and pass it to the modules.
     view = View(passenger_number_config, trip_purposes_config=trip_purposes_config,
-                list_captain_config=list_captain_config)
+                list_captain_config=list_captain_config, communities_config=communities_config)
     controller = Controller(view=view, db_name=f"model/{db_name_config}",
                             server_ip_config=server_ip_config,
                             passenger_number_config=passenger_number_config,
