@@ -22,6 +22,8 @@ class ViewController:
             command=lambda:self.view.raise_frame("finish_trip_frame"))
         self.view.data_display_frame.center_pane.start_trip_button.config(
             command=lambda:self.view.raise_frame("passenger_input_frame"))
+        self.view.data_display_frame.right_pane.biodiversity_button.config(
+            command=lambda:self.view.raise_frame("biodiversity_frame"))
 
     def configure_continue_buttons(self):
         self.view.passenger_input_frame.continue_button.config(
@@ -74,6 +76,22 @@ class ViewController:
         self.view.arrival_port_frame.go_back_button.config(
             command=lambda:self.view.raise_frame("arrival_community_frame")
         )
+        self.view.biodiversity_frame.go_back_button.config(
+            command=lambda:self.view.raise_frame("data_display_frame")
+        )
+        self.view.biodiversity_frame.register_button.config(
+            command=lambda:self._navigate_to_biodiversity_input()
+        )
+        self.view.biodiversity_input_frame.go_back_button.config(
+            command=lambda:self.view.raise_frame("biodiversity_frame")
+        )
+        self.view.biodiversity_input_frame.register_button.config(
+            command=lambda:self.view.raise_frame("data_display_frame")
+        )
+
+    def _navigate_to_biodiversity_input(self):
+        self.view.biodiversity_input_frame.refresh()
+        self.view.raise_frame("biodiversity_input_frame")
 
     def _navigate_to_departure_port(self):
         self.view.departure_port_frame.refresh()

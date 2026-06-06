@@ -24,9 +24,11 @@ class DataDisplayFrame(ttk.Frame):
 
     def show_dock_mode(self) -> None:
         self.center_pane.place_dock_mode_widgets()
+        self.right_pane.hide_biodiversity_button()
 
     def show_trip_mode(self) -> None:
         self.center_pane.place_trip_mode_widgets()
+        self.right_pane.show_biodiversity_button()
 
 
 class LeftPane(ttk.Frame):
@@ -176,6 +178,12 @@ class RightPane(ttk.Frame):
         self.title_solar_power_label.grid(column=0, row=0)
         self.solar_power_label.grid(column=0, row=1)
 
+        self.biodiversity_button = ttk.Button(
+            master=self,
+            text="Avistamiento",
+            style="info.TButton",
+        )
+
         self.place_widgets()
 
     def frame_configuration(self):
@@ -193,3 +201,9 @@ class RightPane(ttk.Frame):
     def place_widgets(self):
         self.load_power_frame.grid(row=1, column=0, sticky="nsew")
         self.solar_power_frame.grid(row=2, column=0, sticky="nesw")
+
+    def show_biodiversity_button(self) -> None:
+        self.biodiversity_button.grid(row=0, column=0, sticky="ne", padx=8, pady=6)
+
+    def hide_biodiversity_button(self) -> None:
+        self.biodiversity_button.grid_forget()

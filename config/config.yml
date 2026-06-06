@@ -23,6 +23,20 @@ database:
                   'Otro'
                   ]
 
+  biodiversity_config: ['Mono Chichico',
+                        'Mono (otro)',
+                        'Delfin',
+                        'Loros',
+                        'Huatzin',
+                        'Garza',
+                        'Capybara',
+                        'Charapa',
+                        'Mariso',
+                        'Serpiente',
+                        'Lagarto',
+                        'Aves (otro)',
+                        'Boa']
+
   captain_config: ["Domingo M",
                    "Mauro Mukucham",
                    "Santiago",
@@ -38,6 +52,10 @@ cerbo_gx:
 passenger_number:
   min: 0
   max: 40
+
+biodiversity_number:
+  min: 1
+  max: 10
 
 communities_config:
   Sharamentsa:

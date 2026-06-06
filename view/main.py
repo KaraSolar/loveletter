@@ -7,15 +7,20 @@ from .trip_purposes_frame import TripPurposes
 from .multi_leg_trip_frame import MultiLegTrip
 from .community_frame import CommunityFrame
 from .port_frame import PortFrame
+from .biodiversity_information_frame import BiodiversityInformation
+from .biodiversity_input_frame import BiodiversityInput
 
 
 class View():
     def __init__(self, passenger_number_config, trip_purposes_config: list,
-                 list_captain_config: list, communities_config: dict):
+                 list_captain_config: list, communities_config: dict,
+                 biodiversity_config: list, biodiversity_number_config: dict):
         self.passenger_number_config = passenger_number_config
         self.trip_purposes_config = trip_purposes_config
         self.captain_config = list_captain_config
         self.communities_config = communities_config
+        self.biodiversity_number_config = biodiversity_number_config
+        self.biodiversity_config = biodiversity_config
         self.root = Root()
         self.root.rowconfigure(0, weight=1, uniform="a")
         self.root.columnconfigure(0, weight=1, uniform="a")
@@ -71,6 +76,16 @@ class View():
         self.frames["departure_port_frame"] = self.departure_port_frame
         self.frames["arrival_community_frame"] = self.arrival_community_frame
         self.frames["arrival_port_frame"] = self.arrival_port_frame
+        self.biodiversity_frame = BiodiversityInformation(
+            self.root, self.root.indicator_font, self.biodiversity_config,
+        )
+        self.biodiversity_input_frame = BiodiversityInput(
+            self.root, self.root.indicator_font,
+            self.biodiversity_number_config,
+            self.biodiversity_frame.biodiversity_var,
+        )
+        self.frames["biodiversity_frame"] = self.biodiversity_frame
+        self.frames["biodiversity_input_frame"] = self.biodiversity_input_frame
 
         for value in self.frames.values():
             value.grid(row=0, column=0, sticky="nsew")
