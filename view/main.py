@@ -9,6 +9,7 @@ from .community_frame import CommunityFrame
 from .port_frame import PortFrame
 from .biodiversity_information_frame import BiodiversityInformation
 from .biodiversity_input_frame import BiodiversityInput
+from .test_frame import TestFrame
 
 
 class View():
@@ -86,6 +87,8 @@ class View():
         )
         self.frames["biodiversity_frame"] = self.biodiversity_frame
         self.frames["biodiversity_input_frame"] = self.biodiversity_input_frame
+        self.test_frame = TestFrame(self.root, self.root.indicator_font)
+        self.frames["test_frame"] = self.test_frame
 
         for value in self.frames.values():
             value.grid(row=0, column=0, sticky="nsew")

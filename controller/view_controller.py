@@ -16,6 +16,7 @@ class ViewController:
         self.configure_finish_trip_frame_buttons()
         self.configure_continue_buttons()
         self.configure_go_back_buttons()
+        self.configure_test_frame()
 
     def configure_data_display_buttons(self):
         self.view.data_display_frame.center_pane.end_trip_button.config(
@@ -89,6 +90,12 @@ class ViewController:
             command=lambda:self.biodiversity_register()
         )
 
+    def configure_test_frame(self):
+        self.view.test_frame.go_back_button.config(
+            command=lambda: self.view.raise_frame("data_display_frame")
+        )
+        self.view.root.bind("<Control-t>", lambda e: self.view.frames["test_frame"].lift())
+
     def _navigate_to_biodiversity_input(self):
         self.view.biodiversity_input_frame.refresh()
         self.view.raise_frame("biodiversity_input_frame")
@@ -139,18 +146,20 @@ class ViewController:
         departure_port = self.view.departure_port_frame.port_var.get()
         arrival_community = self.view.arrival_community_frame.community_var.get()
         arrival_port = self.view.arrival_port_frame.port_var.get()
+        trip_test_flag = self.view.test_frame.test_var.get()
         self.view.data_display_frame.show_trip_mode()
         self.view.raise_frame("data_display_frame")
-        self.data_base_queue.put({"type":"trip",
-                                  "value":{
-                                      "passenger_number":trip_passenger_qty,
-                                      "trip_purpose":trip_purpose,
-                                      "captain":captain,
-                                      "multi_leg_trip":multi_leg_trip,
-                                      "departure_community":departure_community,
-                                      "departure_port":departure_port,
-                                      "arrival_community":arrival_community,
-                                      "arrival_port":arrival_port}
+        self.data_base_queue.put({"type": "trip",
+                                  "value": {
+                                      "passenger_number": trip_passenger_qty,
+                                      "trip_purpose": trip_purpose,
+                                      "captain": captain,
+                                      "multi_leg_trip": multi_leg_trip,
+                                      "departure_community": departure_community,
+                                      "departure_port": departure_port,
+                                      "arrival_community": arrival_community,
+                                      "arrival_port": arrival_port,
+                                      "trip_test_flag": trip_test_flag}
                                   }
                                  )
         self.trip_start_signal_event.set()
