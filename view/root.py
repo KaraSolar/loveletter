@@ -12,9 +12,12 @@ class Root(ttk.Window):
         # Indicator (Label Fonts)
         # Clock Font (could also work for battery gauge for example)
         self.title_font: tuple = ("Digital-7", 20)
-        self.indicator_font: tuple = ("Digital-7", 18)
+        self.indicator_font: tuple = ("Digital-7", 12)
         style = ttk.Style()
         style.configure('info.TButton', font=self.title_font)
+        style.configure("secondary.TButton", font=self.indicator_font)
+        style.configure("success.TButton", font=self.indicator_font)
+        style.configure("Debug.TFrame", background="red")
         self.option_add("*TCombobox*Listbox*Font", self.title_font)
 
     def get_screen_resolution(self) -> tuple:

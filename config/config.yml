@@ -4,7 +4,47 @@ database:
   # name can be "dev_telemetry", "test_telemetry" or "telemetry"
   # for dev, qa, and prod databases.
   name: 'telemetry.db'
-  trip_purposes: ['Escuela', 'Salud', 'Minga', 'Otros']
+  trip_purposes: ['Pesca',
+                  'Caceria',
+                  'Chakra',
+                  'Mingas comunitarias',
+                  'Deporte',
+                  'Salud',
+                  'Educacion',
+                  'Trabajo',
+                  'Turismo',
+                  'Asamblea',
+                  'Reuniones Comunitarias',
+                  'Visitas (Guayusa)',
+                  'Aniversario',
+                  'Monitoreo Territorial',
+                  'Viaje Institucional',
+                  'Apoyo Tecnico',
+                  'Otro'
+                  ]
+
+  biodiversity_config: ['Mono Chichico',
+                        'Mono (otro)',
+                        'Delfin',
+                        'Loros',
+                        'Huatzin',
+                        'Garza',
+                        'Capybara',
+                        'Charapa',
+                        'Mariso',
+                        'Serpiente',
+                        'Lagarto',
+                        'Aves (otro)',
+                        'Boa']
+
+  captain_config: ["Domingo M",
+                   "Mauro Mukucham",
+                   "Santiago",
+                   "Roberto",
+                   "Olger",
+                   "Efren",
+                   "Federico"
+                  ]
 
 cerbo_gx:
   server_ip: '169.254.1.2'
@@ -13,3 +53,57 @@ passenger_number:
   min: 0
   max: 40
 
+biodiversity_number:
+  min: 1
+  max: 10
+
+communities_config:
+  Sharamentsa:
+    - 'Playa Wiriam'
+    - 'Pto. Solar Sharamentsa'
+    - 'Finca Gonzalo Esach'
+    - 'Finca Isolina Vargas'
+    - 'Finca Mercedes Illanes'
+    - 'Nantu Canelos'
+    - 'Elena Pitiur'
+    - 'Ceibo Mentee'
+    - 'Finca Carlos Wanach'
+  Wayusentsa:
+    - 'Pto. Principal Wayusentsa'
+    - 'Pto. Solar Wayusentsa'
+    - 'Pto. Barrio Panki'
+    - 'Pto. Barrio Mente'
+    - 'Pto. Barrio Napi'
+    - 'Pto. TUNA'
+    - 'Finca Federico'
+    - 'Finca Efren'
+    - 'Finca Angel'
+    - 'Finca Sankap'
+    - 'Punto Pto. caceria'
+    - 'Pto. Rafael'
+    - 'Pto. Raul'
+  Kapawi:
+    - 'B.panki, Pto. Callera'
+    - 'B.panki, Pto. Alfredo'
+    - 'Pto. Solar Kapawi'
+    - 'Bocana Rio Pastaza'
+    - 'Pto. Yawantsa '
+  Wichimi:
+    - 'Pto. Solar Wichimi'
+    - 'Pto. San Luis'
+    - 'Pto. Wichimi'
+    - 'Finca de Jorge'
+    - 'Finca de Domingo'
+    - 'Finca de Guillermo'
+    - 'Finca de Abel'
+    - 'Pto. Barrio San Luiz'
+  Napurak:
+    - 'Pto. Napurak'
+  Shuimamus:
+    - 'Pto. Shuimamus'
+  Tsekuntsa:
+    - 'Pto. Comunidad Tsekuntsa'
+  Kusutkao:
+    - 'Pto. Comunidad Kusutkao'
+  Wachirpas:
+    - 'Pto. Comunidad Wachirpas'

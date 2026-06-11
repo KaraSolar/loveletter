@@ -1,127 +1,113 @@
-'''
-This module contains the class PassengerInput, part of the VIEW.
-'''
-
 import ttkbootstrap as ttk
 
+
 class PassengerInput(ttk.Frame):
-    '''
-    A class to represent the Frame Passenger Input, in this frame the user
-    can insert the number of passengers, go back to dock mode, or initialize
-    the trip. Inherints from ttk.Frame
-    ...
-
-    Attributes
-    ----------
-    master : ttk.Window
-        master (Window) of a ttk.Frame
-    label_font_size : tuple
-        font size of label that will be displayed.
-
-    Methods
-    -------
-    passenger_number_label_and_buttons() ->None:
-        create and place the passenger label and button objects in the GUI.
-    
-    action_buttons() -> None:
-        create and place the action buttons (initiate trip and go back) objects
-        in the GUI.
-    
-    decrease_passenger_number() ->None:
-        decrease the variable passenger_number_var by 1.
-
-    increase_passenger_number() ->None:
-        increase the variable passenger_number_var by 1.
-
-    show_message_box_initiate_trip() -> Messagebox:
-        returns a Messagebox object to prompt the user to initiate the trip
-        with the selected number of passengers.    
-    '''
-
-    def __init__(self, master: ttk.Window, label_font_size:tuple, passenger_number_config, trip_purposes_config: list):
+    def __init__(self, master: ttk.Window, label_font_size: tuple, passenger_number_config):
         super().__init__(master)
 
         # ____________Initialize Variables __________
         self.passenger_number_config = passenger_number_config
-        self.trip_purposes_config = trip_purposes_config
         self.max_passenger: int = self.passenger_number_config["max"]
         self.min_passenger: int = self.passenger_number_config["min"]
         self.label_font_size: tuple = label_font_size
         self.passenger_number_var: ttk.IntVar = ttk.IntVar(value=self.min_passenger)
-        self.trip_purpose_var: ttk.StringVar = ttk.StringVar(value='Motivo de viaje')
 
         # ____________FrameConfiguration_____________
-        self.columnconfigure((0,1,2), weight= 1, uniform="a")
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)   # Title row
+        self.rowconfigure(1, weight=6)   # Buttons row
+        self.rowconfigure(2, weight=1)   # Navigation row
+        self.center_dynamic_frame = ttk.Frame(self)
+        self.center_dynamic_frame.grid(row=1, column=0, sticky="nsew")
+        self.center_dynamic_frame.columnconfigure((0, 1, 2), weight=1)
+        self.center_dynamic_frame.rowconfigure(0, weight=1)   # Title row
 
-        self.rowconfigure((0,1,2), weight=1, uniform="a")
-        self.trip_purpose_and_go_back_frame = ttk.Frame(self)
-        self.trip_purpose_and_go_back_frame.columnconfigure(0, weight=1, uniform="a")
-        self.trip_purpose_and_go_back_frame.rowconfigure(0,weight=1, uniform="a")
-        self.trip_purpose_and_go_back_frame.rowconfigure(1, weight=3, uniform="a")
+        self._build_title_frame()
+        self._build_buttons_frame()
+        self._build_navigation_frame()
 
-        self.passenger_number_label_and_buttons()
-        self.action_buttons()
 
     # _________________Methods_____________________________
 
+    def _build_buttons_frame(self) -> None:
 
-    def passenger_number_label_and_buttons(self) ->None:
-        
         # _____________Passenger Number Buttons____________
 
-        self.decrease_passenger_button:ttk.Button = ttk.Button(master=self,
-                                       text= "Menos",
-                                       style="info.TButton",
-                                       command=self.decrease_passenger_number)
-        self.decrease_passenger_button.grid(row=1, column=0, sticky="ens")
+        self.decrease_passenger_button: ttk.Button = ttk.Button(master=self.center_dynamic_frame,
+                                                                text="Menos",
+                                                                style="info.TButton",
+                                                                padding=(10, 20),
+                                                                command=self.decrease_passenger_number)
+        self.decrease_passenger_button.grid(row=0, column=0, sticky="ew")
 
-        self.increase_passenger_button:ttk.Button = ttk.Button(master=self,
-                                                    style="info.TButton",
-                                                    text= "Mas",
-                                                    width=6,
-                                                    command=self.increase_passenger_number)
-        self.increase_passenger_button.grid(row=1, column=2, sticky="wns")
-
-
-        # _______________Passenger Indicator______________
-        self.passenger_number_label:ttk.Label = ttk.Label(master=self,
-                                          textvariable = self.passenger_number_var,
-                                          font=("Digital-7", 40))
-        self.passenger_number_label.grid(row=1, column=1, sticky="ns")
-
+        self.increase_passenger_button: ttk.Button = ttk.Button(master=self.center_dynamic_frame,
+                                                                style="info.TButton",
+                                                                text="Mas",
+                                                                padding=(10, 20),
+                                                                width=6,
+                                                                command=self.increase_passenger_number)
+        self.increase_passenger_button.grid(row=0, column=2, sticky="ew")
 
         # _______________Passenger Indicator______________
-        self.trip_purposes_combobox: ttk.Combobox = ttk.Combobox(master=self.trip_purpose_and_go_back_frame,
-                                                                textvariable=self.trip_purpose_var,
-                                                                values=self.trip_purposes_config,
-                                                                state="readonly",
-                                                                bootstyle="info",
-                                                                font=("Digital-7", 20))
-        self.trip_purposes_combobox.grid(row=1, column=0, sticky = "sew", pady=(0,20))
-        self.trip_purpose_and_go_back_frame.grid(row=0, column=1, sticky="nsew")
-
-    def action_buttons(self) -> None:
-        # _______________Start Trip________________________
-        self.start_trip_button:ttk.Button = ttk.Button(master=self,
-                                            text="Iniciar Viaje",
-                                            style="info.TButton")
-        self.start_trip_button.grid(row=2, column=1, sticky="ew")
-
-
-        # _______________Go back _________________________
-        self.go_back_button:ttk.Button = ttk.Button(master=self.trip_purpose_and_go_back_frame,
-                                         text="Regresar",
-                                         style="info.TButton")
-        self.go_back_button.grid(row=0, column=0, sticky="new", pady=(25,0), rowspan=2)
+        self.passenger_number_label: ttk.Label = ttk.Label(master=self.center_dynamic_frame,
+                                                           textvariable=self.passenger_number_var,
+                                                           font=("Digital-7", 50))
+        self.passenger_number_label.grid(row=0, column=1)
 
 
     # ________________command methods_____________________
-    def decrease_passenger_number(self) ->None:
-        n:int = self.passenger_number_var.get()
-        if n > self.min_passenger:
-            self.passenger_number_var.set(n-1)
+    def refresh(self) -> None:
+        self.passenger_number_var.set(self.min_passenger)
 
-    def increase_passenger_number(self) ->None:
-        n:int = self.passenger_number_var.get()
+    def decrease_passenger_number(self) -> None:
+        n: int = self.passenger_number_var.get()
+        if n > self.min_passenger:
+            self.passenger_number_var.set(n - 1)
+
+    def increase_passenger_number(self) -> None:
+        n: int = self.passenger_number_var.get()
         if n < self.max_passenger:
-            self.passenger_number_var.set(n+1)
+            self.passenger_number_var.set(n + 1)
+
+    # _________________ Row 0 — Title _____________________________
+    def _build_title_frame(self) -> None:
+        title_frame = ttk.Frame(self, padding=(10, 8))
+        title_frame.grid(row=0, column=0, sticky="nsew")
+        title_frame.columnconfigure(0, weight=1)
+
+        ttk.Label(
+            title_frame,
+            text="Seleccionar Numero de Pasajeros",
+            font=(*self.label_font_size, "bold"),
+            anchor="center",
+        ).grid(row=0, column=0, sticky="ew")
+
+    # _________________ Row 2 — Navigation _______________________
+    def _build_navigation_frame(self) -> None:
+        nav_frame = ttk.Frame(self, padding=(12, 8))
+        nav_frame.grid(row=2, column=0, sticky="nsew")
+
+        # Three columns: [back btn] [spacer] [forward btn]
+        nav_frame.columnconfigure(0, weight=1)
+        nav_frame.columnconfigure(1, weight=0)   # fixed spacer
+        nav_frame.columnconfigure(2, weight=1)
+        nav_frame.rowconfigure(0, weight=1)
+
+        self.go_back_button = ttk.Button(
+            master=nav_frame,
+            text="← Regresar",
+            style="info.Outline.TButton",
+            width=16,
+        )
+        self.go_back_button.grid(row=0, column=0, sticky="e", padx=(0, 10))
+
+        # Invisible spacer label keeps the two buttons centred with a gap
+        ttk.Label(nav_frame, text="", width=4).grid(row=0, column=1)
+
+        self.continue_button = ttk.Button(
+            master=nav_frame,
+            text="Continuar →",
+            style="info.TButton",
+            width=16,
+        )
+        self.continue_button.grid(row=0, column=2, sticky="w", padx=(10, 0))
