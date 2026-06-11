@@ -59,16 +59,14 @@ biodiversity_number:
 
 communities_config:
   Sharamentsa:
-    - 'Pto. Shuimamus'
-    - 'Pto. Napurak'
-    - 'Playa'
+    - 'Playa Wiriam'
     - 'Pto. Solar Sharamentsa'
     - 'Finca Gonzalo Esach'
     - 'Finca Isolina Vargas'
     - 'Finca Mercedes Illanes'
     - 'Nantu Canelos'
     - 'Elena Pitiur'
-    - 'Ceibo'
+    - 'Ceibo Mentee'
     - 'Finca Carlos Wanach'
   Wayusentsa:
     - 'Pto. Principal Wayusentsa'
@@ -76,9 +74,6 @@ communities_config:
     - 'Pto. Barrio Panki'
     - 'Pto. Barrio Mente'
     - 'Pto. Barrio Napi'
-    - 'Pto. Com. Tsekuntsa'
-    - 'Pto. Com. Kusutkao'
-    - 'Pto. Solar Kapawi'
     - 'Pto. TUNA'
     - 'Finca Federico'
     - 'Finca Efren'
@@ -90,10 +85,9 @@ communities_config:
   Kapawi:
     - 'B.panki, Pto. Callera'
     - 'B.panki, Pto. Alfredo'
-    - 'Pto. Com. Wachirpas'
     - 'Pto. Solar Kapawi'
     - 'Bocana Rio Pastaza'
-    - 'Pto. Yawantsa'
+    - 'Pto. Yawantsa '
   Wichimi:
     - 'Pto. Solar Wichimi'
     - 'Pto. San Luis'
@@ -103,3 +97,13 @@ communities_config:
     - 'Finca de Guillermo'
     - 'Finca de Abel'
     - 'Pto. Barrio San Luiz'
+  Napurak:
+    - 'Pto. Napurak'
+  Shuimamus:
+    - 'Pto. Shuimamus'
+  Tsekuntsa:
+    - 'Pto. Comunidad Tsekuntsa'
+  Kusutkao:
+    - 'Pto. Comunidad Kusutkao'
+  Wachirpas:
+    - 'Pto. Comunidad Wachirpas'
